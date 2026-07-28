@@ -1,0 +1,41 @@
+{
+  "name": "NextJS - Material UI",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "node --env-file-if-exists=.env scripts/server.mjs dev",
+    "build": "next build",
+    "postbuild": "node scripts/copy-standalone-assets.mjs",
+    "start": "node --env-file-if-exists=.env scripts/server.mjs start",
+    "start:standalone": "node --env-file-if-exists=.env scripts/start-standalone.mjs",
+    "db:apply": "node --env-file-if-exists=.env scripts/apply-sql.mjs",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@emotion/cache": "^11.14.0",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@mui/icons-material": "^6.3.1",
+    "@mui/material": "^6.3.1",
+    "@mui/material-nextjs": "^6.3.1",
+    "@mui/x-date-pickers": "^7.29.4",
+    "dayjs": "^1.11.21",
+    "exceljs": "^4.4.0",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^4.2.1",
+    "mysql2": "^3.23.2",
+    "next": "^15.1.4",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-number-format": "^5.4.5"
+  },
+  "devDependencies": {
+    "eslint": "^9",
+    "eslint-config-next": "^15.1.4"
+  },
+  "allowScripts": {
+    "core-js@3.49.0": true,
+    "sharp@0.34.5": true,
+    "unrs-resolver@1.12.2": true
+  }
+}

@@ -1,0 +1,30 @@
+-- Bảng SysLogs
+DROP TABLE IF EXISTS `SysLogs`;
+CREATE TABLE `SysLogs` (
+  `Id` bigint NOT NULL AUTO_INCREMENT,
+  `CreatedAt` datetime NOT NULL DEFAULT (UTC_TIMESTAMP()),
+  `RequestId` varchar(50) NULL,
+  `Method` varchar(10) NULL,
+  `Url` varchar(500) NULL,
+  `StatusCode` smallint NULL,
+  `ResponseTime` int NULL,
+  `Headers` varchar(2500) NULL,
+  `Body` varchar(2000) NULL,
+  `Response` longtext NULL,
+  `Error` longtext NULL,
+  `UserAgent` varchar(255) NULL,
+  `IpAddress` varchar(45) NULL,
+  `ForwardedFor` varchar(100) NULL,
+  `Origin` varchar(100) NULL,
+  `UserId` int NULL,
+  `Level` tinyint(4) NOT NULL DEFAULT 3,
+  `Message` varchar(200) NULL,
+  `CreatedBy` varchar(20) NULL,
+  PRIMARY KEY (`Id`, `CreatedAt`),
+  KEY `CIX_SysLogs_CreatedAt` (`CreatedAt`, `Id`),
+  KEY `IX_SysLogs_Errors` (`CreatedAt`),
+  KEY `IX_SysLogs_IpAddress_CreatedAt` (`IpAddress`, `CreatedAt`),
+  KEY `IX_SysLogs_RequestId` (`CreatedAt`, `RequestId`),
+  KEY `IX_SysLogs_StatusCode_CreatedAt` (`StatusCode`, `CreatedAt`),
+  KEY `IX_SysLogs_UserId_CreatedAt` (`UserId`, `CreatedAt`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
