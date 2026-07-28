@@ -32,7 +32,7 @@ yarn-error.log*
 .pnpm-debug.log*
 
 # env files (chứa thông tin kết nối DB, SESSION_SECRET...)
-!.env
+#.env
 .env*.local
 .env.development
 .env.production
