@@ -347,7 +347,7 @@ export default function MenusPage() {
         <TableCell>
           <Box sx={{ display: "flex", alignItems: "center", pl: depth * 3 }}>
             {hasChildren ? (
-              <IconButton size="small" onClick={() => toggleNode(n.id)} sx={{ mr: 0.5 }}>
+              <IconButton size="medium" onClick={() => toggleNode(n.id)} sx={{ mr: 0.5 }}>
                 {open ? <ExpandMore fontSize="small" /> : <ChevronRight fontSize="small" />}
               </IconButton>
             ) : (
@@ -369,17 +369,17 @@ export default function MenusPage() {
           )}
         </TableCell>
         <TableCell align="center">
-          <Stack direction="row" spacing={0.5} justifyContent="center">
+          <Stack direction="row" spacing={0.75} justifyContent="center">
             {perms.canEdit && (
               <Tooltip title="Sửa">
-                <IconButton size="small" color="secondary" onClick={() => openEdit(n)} sx={{ border: 1, borderColor: "secondary.main", borderRadius: 1 }}>
+                <IconButton size="medium" color="secondary" onClick={() => openEdit(n)} sx={{ border: 1, borderColor: "secondary.main", borderRadius: 1 }}>
                   <Edit fontSize="small" />
                 </IconButton>
               </Tooltip>
             )}
             {perms.canDelete && (
               <Tooltip title="Xóa">
-                <IconButton size="small" color="error" onClick={() => setDeleteTarget(n)} sx={{ border: 1, borderColor: "error.main", borderRadius: 1 }}>
+                <IconButton size="medium" color="error" onClick={() => setDeleteTarget(n)} sx={{ border: 1, borderColor: "error.main", borderRadius: 1 }}>
                   <Delete fontSize="small" />
                 </IconButton>
               </Tooltip>
@@ -731,7 +731,7 @@ export default function MenusPage() {
             sx={{ width: 110 }}
           />
           <Button
-            size="small"
+            size="medium"
             variant="outlined"
             color="inherit"
             onClick={() => {

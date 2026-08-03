@@ -352,7 +352,7 @@ export default function WardsPage() {
                       >
                         <TableCell>
                           <IconButton
-                            size="small"
+                            size="medium"
                             color="primary"
                             onClick={(e) => {
                               e.stopPropagation();
@@ -396,17 +396,17 @@ export default function WardsPage() {
                               )}
                             </TableCell>
                             <TableCell align="center">
-                              <Stack direction="row" spacing={0.5} justifyContent="center">
+                              <Stack direction="row" spacing={0.75} justifyContent="center">
                                 {perms.canEdit && (
                                   <Tooltip title="Sửa">
-                                    <IconButton size="small" color="secondary" onClick={() => openEdit(r)} sx={{ border: 1, borderColor: "secondary.main", borderRadius: 1 }}>
+                                    <IconButton size="medium" color="secondary" onClick={() => openEdit(r)} sx={{ border: 1, borderColor: "secondary.main", borderRadius: 1 }}>
                                       <Edit fontSize="small" />
                                     </IconButton>
                                   </Tooltip>
                                 )}
                                 {perms.canDelete && (
                                   <Tooltip title="Xóa">
-                                    <IconButton size="small" color="error" onClick={() => setDeleteTarget(r)} sx={{ border: 1, borderColor: "error.main", borderRadius: 1 }}>
+                                    <IconButton size="medium" color="error" onClick={() => setDeleteTarget(r)} sx={{ border: 1, borderColor: "error.main", borderRadius: 1 }}>
                                       <Delete fontSize="small" />
                                     </IconButton>
                                   </Tooltip>

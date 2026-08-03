@@ -374,13 +374,13 @@ export default function LocationsPage() {
                                         <TableCell align="center">
                                             <Stack
                                                 direction="row"
-                                                spacing={0.5}
+                                                spacing={0.75}
                                                 justifyContent="center"
                                             >
                                                 {perms.canEdit && (
                                                     <Tooltip title="Sửa">
                                                         <IconButton
-                                                            size="small"
+                                                            size="medium"
                                                             color="secondary"
                                                             onClick={() => openEdit(r)}
                                                             sx={{
@@ -396,7 +396,7 @@ export default function LocationsPage() {
                                                 {perms.canDelete && (
                                                     <Tooltip title="Xóa">
                                                         <IconButton
-                                                            size="small"
+                                                            size="medium"
                                                             color="error"
                                                             onClick={() => setDeleteTarget(r)}
                                                             sx={{

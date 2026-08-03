@@ -224,7 +224,7 @@ export default function LoginPage() {
           <Button
             type="submit"
             variant="contained"
-            size="large"
+            size="medium"
             disabled={submitting}
           >
             {submitting ? <><CircularProgress size={18} color="inherit" sx={{ mr: 1 }} />Đang đăng nhập...</> : "Đăng nhập"}

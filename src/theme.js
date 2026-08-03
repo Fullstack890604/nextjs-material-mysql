@@ -35,14 +35,15 @@ const theme = createTheme({
       },
     },
     MuiButton: {
-      defaultProps: { disableElevation: true },
+      defaultProps: { disableElevation: true, size: "medium" },
       styleOverrides: {
-        root: { minHeight: 44, borderRadius: 10, paddingInline: 18 },
+        root: { minHeight: 36, borderRadius: 8, paddingInline: 16, textTransform: "uppercase" },
         contained: { boxShadow: `0 5px 14px ${alpha(palette.primary.main, 0.2)}` },
       },
     },
     MuiIconButton: {
-      styleOverrides: { root: { minWidth: 44, minHeight: 44 } },
+      defaultProps: { size: "medium" },
+      styleOverrides: { root: { minWidth: 40, minHeight: 40, borderRadius: "50% !important" } },
     },
     MuiListItemButton: {
       styleOverrides: {
@@ -93,7 +94,12 @@ const theme = createTheme({
       },
     },
     MuiDialog: {
-      styleOverrides: { paper: { border: `1px solid ${palette.divider}`, borderRadius: 16 } },
+      styleOverrides: {
+        paper: {
+          border: "1px solid rgba(0, 0, 0, 0.12)",
+          borderRadius: 16,
+        },
+      },
     },
     MuiTooltip: { defaultProps: { arrow: true, enterDelay: 500 } },
   },

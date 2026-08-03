@@ -387,11 +387,11 @@ export default function AccountsPage() {
                       )}
                     </TableCell>
                     <TableCell align="center">
-                      <Stack direction="row" spacing={0.5} justifyContent="center">
+                      <Stack direction="row" spacing={0.75} justifyContent="center">
                         {perms.canEdit && (
                           <Tooltip title="Sửa">
                             <IconButton
-                              size="small"
+                              size="medium"
                               color="secondary"
                               onClick={() => openEdit(r)}
                               sx={{ border: 1, borderColor: "secondary.main", borderRadius: 1 }}
@@ -403,7 +403,7 @@ export default function AccountsPage() {
                         {perms.canDelete && (
                           <Tooltip title="Xóa">
                             <IconButton
-                              size="small"
+                              size="medium"
                               color="error"
                               onClick={() => setDeleteTarget(r)}
                               sx={{ border: 1, borderColor: "error.main", borderRadius: 1 }}
