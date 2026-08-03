@@ -56,7 +56,7 @@ export default function Breadcrumbs() {
   }
 
   return (
-    <Box sx={{ px: 3, py: 0.8, borderBottom: 1, borderColor: "divider" }}>
+    <Box sx={{ px: { xs: 2, sm: 2.5, lg: 3 }, py: 1, borderBottom: 1, borderColor: "divider", bgcolor: "background.paper" }}>
       <MuiBreadcrumbs
         separator={<NavigateNext fontSize="small" />}
         aria-label="breadcrumb"

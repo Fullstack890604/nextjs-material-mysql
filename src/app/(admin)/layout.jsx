@@ -51,7 +51,27 @@ export default function AdminLayout({ children }) {
   return (
     <MenuProvider>
       <SearchProvider>
-        <Box sx={{ display: "flex", height: "100vh", overflow: "hidden" }}>
+        <Box sx={{ display: "flex", height: "100dvh", overflow: "hidden", bgcolor: "background.default" }}>
+          <Box
+            component="a"
+            href="#main-content"
+            sx={{
+              position: "fixed",
+              zIndex: 2000,
+              top: 8,
+              left: 8,
+              px: 2,
+              py: 1,
+              borderRadius: 1,
+              bgcolor: "primary.dark",
+              color: "primary.contrastText",
+              textDecoration: "none",
+              transform: "translateY(-150%)",
+              "&:focus": { transform: "translateY(0)" },
+            }}
+          >
+            Bỏ qua điều hướng
+          </Box>
           {isMobile ? (
             <Drawer
               variant="temporary"
@@ -74,7 +94,17 @@ export default function AdminLayout({ children }) {
               }
             />
             <Breadcrumbs />
-            <Box component="main" sx={{ flex: 1, overflowY: "auto", p: 1.5 }}>
+            <Box
+              component="main"
+              id="main-content"
+              tabIndex={-1}
+              sx={{
+                flex: 1,
+                overflowY: "auto",
+                p: { xs: 2, sm: 2.5, lg: 3 },
+                scrollBehavior: "smooth",
+              }}
+            >
               <RouteGuard>{children}</RouteGuard>
             </Box>
           </Box>

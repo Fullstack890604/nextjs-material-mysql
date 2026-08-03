@@ -52,8 +52,8 @@ export default function PageHeader({ title, subtitle, icon, actions }) {
           />
         )}
         <Box sx={{ minWidth: 0 }}>
-          <Typography variant="h7" fontWeight={700} lineHeight={0.8} color="primary.main">
-            {title.toUpperCase()}
+          <Typography variant="h6" fontWeight={700} lineHeight={1.2} color="text.primary">
+            {title}
           </Typography>
           {subtitle && (
             <Typography variant="body2" color="text.secondary" sx={{ mt: 0.25 }}>

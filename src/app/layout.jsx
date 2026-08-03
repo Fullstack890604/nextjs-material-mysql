@@ -25,7 +25,7 @@ export default function RootLayout({ children }) {
         {/* eslint-disable-next-line @next/next/no-page-custom-font */}
         <link
           rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500;600;700&display=swap"
         />
       </head>
       <body suppressHydrationWarning>
@@ -36,7 +36,7 @@ export default function RootLayout({ children }) {
               margin: "0",
               background: palette.error.dark,
               color: palette.error.contrastText,
-              fontFamily: "Roboto, Arial, sans-serif",
+              fontFamily: "Fira Sans, Arial, sans-serif",
               fontSize: "15px",
               textAlign: "center",
             }}

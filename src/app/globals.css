@@ -1,1 +1,26 @@
-/* Reset và style mặc định do MUI CssBaseline đảm nhiệm */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  min-width: 320px;
+}
+
+:focus-visible {
+  outline: 3px solid rgba(8, 145, 178, 0.35);
+  outline-offset: 2px;
+}
+
+* {
+  scrollbar-color: #a9c3cc transparent;
+  scrollbar-width: thin;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

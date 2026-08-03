@@ -15,11 +15,15 @@ import {
   TextField,
   Typography,
   Alert,
+  CircularProgress,
 } from "@mui/material";
 import {
   Lock,
   Person,
   Apps,
+  CheckCircleOutline,
+  ShieldOutlined,
+  SpeedOutlined,
   Visibility,
   VisibilityOff,
 } from "@mui/icons-material";
@@ -77,15 +81,51 @@ export default function LoginPage() {
   return (
     <Box
       sx={{
-        minHeight: "100vh",
-        display: "flex",
+        minHeight: "100dvh",
+        display: "grid",
+        gridTemplateColumns: { xs: "1fr", md: "minmax(360px, 0.9fr) minmax(480px, 1.1fr)" },
         alignItems: "center",
-        justifyContent: "center",
-        p: 2,
+        p: { xs: 2, sm: 3, md: 4 },
+        gap: { md: 4 },
         bgcolor: "background.default",
+        backgroundImage: (theme) =>
+          `radial-gradient(circle at 12% 8%, ${theme.palette.primary.light}24, transparent 34%), radial-gradient(circle at 88% 92%, ${theme.palette.secondary.light}1F, transparent 30%)`,
       }}
     >
-      <Paper elevation={3} sx={{ width: "100%", maxWidth: 420, p: 4 }}>
+      <Box
+        component="section"
+        aria-label="Giới thiệu hệ thống"
+        sx={{ display: { xs: "none", md: "flex" }, flexDirection: "column", justifyContent: "center", p: { md: 3, lg: 7 }, maxWidth: 680 }}
+      >
+        <Box sx={{ width: 56, height: 56, borderRadius: 3, display: "grid", placeItems: "center", bgcolor: "primary.main", color: "primary.contrastText", boxShadow: 2, mb: 3 }}>
+          <Apps sx={{ fontSize: 30 }} />
+        </Box>
+        <Typography variant="overline" color="primary.main" fontWeight={700} letterSpacing={1.4}>
+          Nền tảng vận hành tập trung
+        </Typography>
+        <Typography component="h1" variant="h3" sx={{ mt: 1, maxWidth: 580 }}>
+          Quản lý rõ ràng, vận hành liền mạch.
+        </Typography>
+        <Typography color="text.secondary" sx={{ mt: 2, maxWidth: 560, fontSize: 18 }}>
+          Truy cập dữ liệu, danh mục và phân quyền trong một không gian làm việc an toàn, nhất quán.
+        </Typography>
+        <Stack spacing={1.75} sx={{ mt: 4 }}>
+          {[
+            [SpeedOutlined, "Thao tác nhanh với giao diện tối ưu cho công việc hằng ngày"],
+            [ShieldOutlined, "Kiểm soát truy cập và phiên đăng nhập an toàn"],
+            [CheckCircleOutline, "Dữ liệu được tổ chức rõ ràng, dễ theo dõi"],
+          ].map(([Icon, text]) => (
+            <Stack key={text} direction="row" spacing={1.5} alignItems="center">
+              <Box sx={{ width: 36, height: 36, borderRadius: 2, bgcolor: "background.paper", color: "primary.main", display: "grid", placeItems: "center", border: 1, borderColor: "divider" }}>
+                <Icon fontSize="small" />
+              </Box>
+              <Typography color="text.secondary">{text}</Typography>
+            </Stack>
+          ))}
+        </Stack>
+      </Box>
+
+      <Paper elevation={2} sx={{ width: "100%", maxWidth: 460, p: { xs: 3, sm: 4.5 }, justifySelf: { md: "center" }, borderRadius: 4 }}>
         <Box
           sx={{
             display: "flex",
@@ -95,14 +135,14 @@ export default function LoginPage() {
             mb: 4,
           }}
         >
-          <Avatar sx={{ bgcolor: "primary.main", mb: 1.5, width: 56, height: 56 }}>
+          <Avatar sx={{ bgcolor: "primary.main", mb: 1.5, width: 52, height: 52, display: { md: "none" } }}>
             <Apps />
           </Avatar>
-          <Typography variant="h5" fontWeight={700} color="primary.main">
-            NextJS - Material UI
+          <Typography component="h1" variant="h5" fontWeight={700} color="text.primary">
+            Chào mừng trở lại
           </Typography>
-          <Typography variant="body2" color="secondary.main" fontWeight={600} sx={{ mt: 0.5 }}>
-            Analytics Platform
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 0.75 }}>
+            Đăng nhập để tiếp tục vào hệ thống quản trị
           </Typography>
         </Box>
 
@@ -117,6 +157,8 @@ export default function LoginPage() {
             onChange={(e) => setUsername(e.target.value)}
             placeholder="Nhập tài khoản ..."
             fullWidth
+            required
+            autoFocus
             autoComplete="username"
             slotProps={{
               input: {
@@ -136,6 +178,7 @@ export default function LoginPage() {
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Nhập mật khẩu ..."
             fullWidth
+            required
             autoComplete="current-password"
             slotProps={{
               input: {
@@ -149,7 +192,7 @@ export default function LoginPage() {
                     <IconButton
                       onClick={() => setShowPassword((s) => !s)}
                       edge="end"
-                      size="small"
+                      aria-label={showPassword ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
                     >
                       {showPassword ? <VisibilityOff /> : <Visibility />}
                     </IconButton>
@@ -159,7 +202,7 @@ export default function LoginPage() {
             }}
           />
 
-          {error && <Alert severity="error">{error}</Alert>}
+          {error && <Alert severity="error" role="alert">{error}</Alert>}
 
           <Stack
             direction="row"
@@ -184,7 +227,7 @@ export default function LoginPage() {
             size="large"
             disabled={submitting}
           >
-            {submitting ? "Đang đăng nhập..." : "Đăng nhập"}
+            {submitting ? <><CircularProgress size={18} color="inherit" sx={{ mr: 1 }} />Đang đăng nhập...</> : "Đăng nhập"}
           </Button>
         </Box>
 
@@ -193,7 +236,7 @@ export default function LoginPage() {
           color="text.secondary"
           sx={{ display: "block", textAlign: "center", mt: 3 }}
         >
-          © {new Date().getFullYear()} Dashboard Template. All rights reserved.
+          © {new Date().getFullYear()} Hệ thống quản trị · Kết nối an toàn
         </Typography>
       </Paper>
     </Box>
