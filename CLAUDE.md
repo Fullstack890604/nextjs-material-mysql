@@ -155,3 +155,40 @@ const search = usePageSearch("Tìm theo mã, tên, mô tả..."); // placeholder
 ## Locations / multi-branch
 
 Several tables (`Patient`, `Appointment`…) key off `LocationCode` — see `database/Locations.sql` and `SysLocationPermissions.sql`. The system supports multiple clinic locations with per-account location permissions; check `SysLocationPermissions` when working on data scoping.
+
+## Session changes — UI/theme work (2026-08-03)
+
+### Completed
+
+- Installed the global `ui-ux-pro-max` Codex skill and applied its accessibility/consistency guidance to the MUI UI.
+- Standardized MUI `Button` defaults to `size="medium"`, uppercase labels, reduced radius, and medium visual dimensions.
+- Standardized table action `IconButton`s to medium circular controls; action-column spacing is `0.75`.
+- Added a global theme system:
+  - `src/themePresets.js` contains selectable palettes.
+  - `src/components/AppThemeProvider.jsx` owns the client-side theme state and persists it as `localStorage["app-theme"]`.
+  - `src/theme.js` now exports `createAppTheme(appPalette)` so the same component rules are reused by every palette.
+- Added a standalone theme picker to `TopNav` using a two-column menu. The picker is a floating circular `Fab` centered on the right edge for both desktop and mobile; the duplicate TopNav theme button is hidden.
+- The current visible theme choices are modern/light-oriented: `Neutral`, `Blue`, `Indigo`, `Ocean`, `Rose`, `Mint`, `Lilac`, `Sky`, and `Lemon`. New users default to `Ocean`; a valid previous choice is preserved.
+- Added responsive search positioning in `TopNav`; desktop search is left-aligned after the menu area, while mobile keeps the expandable search behavior.
+- Fixed the theme hydration mismatch by rendering a neutral pre-hydration splash, then reading `localStorage` after mount. This avoids both the yellow-theme flash and server/client MUI class mismatches.
+
+### Current status
+
+- `npm run lint` passes with no ESLint warnings or errors.
+- The production build compiles the application successfully but still fails during prerendering because `/api/auth/login/route` cannot be found. This is a separate existing route/build issue and must be fixed before treating `npm run build` as green.
+- Browser-level visual verification of `http://localhost:2468/settings/categories/staff` was not completed in this session; the browser connection failed and the fallback localhost check was interrupted.
+
+### Decisions
+
+- Theme switching is client-side and persisted in `localStorage` because the selector is interactive and user-specific.
+- Theme selection is kept in a dedicated provider instead of mutating the static layout theme, so all MUI components receive one consistent theme instance.
+- Status colors (`success`, `warning`, `info`, `error`) remain semantically colored across palettes; only brand/action surfaces change with the selected theme.
+- The visible picker intentionally excludes duplicate/dark/overly saturated variants to keep the user-facing list modern, light, and visually distinct.
+- A single floating theme control is used at all breakpoints to avoid duplicate controls and to keep the action discoverable on mobile.
+
+### Next priorities
+
+1. Fix or restore `src/app/api/auth/login/route.js` so `npm run build` completes successfully.
+2. Run the app and visually verify the staff table, TopNav search, floating theme picker, and all theme choices at desktop and mobile breakpoints.
+3. Check the remaining legacy palette definitions in `src/themePresets.js`; remove unused hidden presets if they are no longer needed, while preserving the `localStorage` fallback for invalid old keys.
+4. If the theme list grows further, add a small theme search or grouping rather than extending the two-column menu indefinitely.
