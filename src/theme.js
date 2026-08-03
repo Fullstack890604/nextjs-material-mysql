@@ -6,7 +6,7 @@ import { palette } from "@/palette";
 
 const theme = createTheme({
   palette,
-  shape: { borderRadius: 12 },
+  shape: { borderRadius: 6 },
   typography: {
     fontFamily: '"Fira Sans", "Roboto", "Arial", sans-serif',
     h1: { fontWeight: 700, letterSpacing: "-0.035em" },
@@ -21,10 +21,10 @@ const theme = createTheme({
   },
   shadows: [
     "none",
-    "0 1px 2px rgba(15, 52, 65, 0.05)",
-    "0 4px 16px rgba(15, 52, 65, 0.07)",
-    "0 8px 28px rgba(15, 52, 65, 0.09)",
-    ...Array(21).fill("0 12px 36px rgba(15, 52, 65, 0.12)"),
+    "0 1px 2px rgba(15, 23, 42, 0.05)",
+    "0 4px 16px rgba(15, 23, 42, 0.07)",
+    "0 8px 28px rgba(15, 23, 42, 0.09)",
+    ...Array(21).fill("0 12px 36px rgba(15, 23, 42, 0.12)"),
   ],
   components: {
     MuiCssBaseline: {
@@ -37,7 +37,7 @@ const theme = createTheme({
     MuiButton: {
       defaultProps: { disableElevation: true, size: "medium" },
       styleOverrides: {
-        root: { minHeight: 36, borderRadius: 8, paddingInline: 16, textTransform: "uppercase" },
+        root: { minHeight: 36, borderRadius: 6, paddingInline: 16, textTransform: "uppercase" },
         contained: { boxShadow: `0 5px 14px ${alpha(palette.primary.main, 0.2)}` },
       },
     },
@@ -49,7 +49,7 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           minHeight: 44,
-          borderRadius: 10,
+          borderRadius: 6,
           transition: "background-color 180ms ease, color 180ms ease",
           "&.Mui-selected": {
             color: palette.primary.dark,
@@ -66,7 +66,7 @@ const theme = createTheme({
         root: {
           border: `1px solid ${palette.divider}`,
           backgroundImage: "none",
-          boxShadow: "0 4px 18px rgba(15, 52, 65, 0.045)",
+          boxShadow: "0 4px 18px rgba(15, 23, 42, 0.045)",
         },
       },
     },
@@ -85,7 +85,7 @@ const theme = createTheme({
       },
     },
     MuiTableHead: {
-      styleOverrides: { root: { backgroundColor: "#EAF4F7" } },
+      styleOverrides: { root: { backgroundColor: "#F1F5F9" } },
     },
     MuiTableCell: {
       styleOverrides: {
@@ -97,7 +97,7 @@ const theme = createTheme({
       styleOverrides: {
         paper: {
           border: "1px solid rgba(0, 0, 0, 0.12)",
-          borderRadius: 16,
+          borderRadius: 8,
         },
       },
     },

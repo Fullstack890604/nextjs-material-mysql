@@ -1,27 +1,27 @@
 export const palette = {
   mode: "light",
   primary: {
-    main: "#1976D2",
-    light: "#42A5F5",
-    dark: "#1565C0",
+    main: "#475569",
+    light: "#64748B",
+    dark: "#334155",
     contrastText: "#ffffff",
   },
   secondary: {
-    main: "#1976D2",
-    light: "#42A5F5",
-    dark: "#1565C0",
+    main: "#64748B",
+    light: "#94A3B8",
+    dark: "#475569",
     contrastText: "#ffffff",
   },
   background: {
-    default: "#F4F8FA",
+    default: "#F8FAFC",
     paper: "#FFFFFF",
   },
   text: {
-    primary: "#164E63",
-    secondary: "#526D78",
-    disabled: "#8AA0AA",
+    primary: "#0F172A",
+    secondary: "#475569",
+    disabled: "#94A3B8",
   },
-  divider: "#D9E8ED",
+  divider: "#E2E8F0",
   // Màu trạng thái (dùng cho Chip/Dot trạng thái lịch hẹn qua statusColor()):
   //   Chờ xác nhận -> warning | Đã xác nhận -> info | Đã đến -> primary
   //   Hoàn thành   -> success | Đã hủy      -> error
