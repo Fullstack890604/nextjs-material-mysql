@@ -4,8 +4,8 @@ import { createTheme } from "@mui/material/styles";
 import { alpha } from "@mui/material/styles";
 import { palette } from "@/palette";
 
-const theme = createTheme({
-  palette,
+export const createAppTheme = (appPalette = palette) => createTheme({
+  palette: appPalette,
   shape: { borderRadius: 6 },
   typography: {
     fontFamily: '"Fira Sans", "Roboto", "Arial", sans-serif',
@@ -31,14 +31,14 @@ const theme = createTheme({
       styleOverrides: {
         body: { minWidth: 320 },
         "*": { boxSizing: "border-box" },
-        "::selection": { backgroundColor: alpha(palette.primary.main, 0.2) },
+        "::selection": { backgroundColor: alpha(appPalette.primary.main, 0.2) },
       },
     },
     MuiButton: {
       defaultProps: { disableElevation: true, size: "medium" },
       styleOverrides: {
         root: { minHeight: 36, borderRadius: 6, paddingInline: 16, textTransform: "uppercase" },
-        contained: { boxShadow: `0 5px 14px ${alpha(palette.primary.main, 0.2)}` },
+        contained: { boxShadow: `0 5px 14px ${alpha(appPalette.primary.main, 0.2)}` },
       },
     },
     MuiIconButton: {
@@ -52,10 +52,10 @@ const theme = createTheme({
           borderRadius: 6,
           transition: "background-color 180ms ease, color 180ms ease",
           "&.Mui-selected": {
-            color: palette.primary.dark,
-            backgroundColor: alpha(palette.primary.main, 0.11),
+            color: appPalette.primary.dark,
+            backgroundColor: alpha(appPalette.primary.main, 0.11),
           },
-          "&.Mui-selected:hover": { backgroundColor: alpha(palette.primary.main, 0.16) },
+          "&.Mui-selected:hover": { backgroundColor: alpha(appPalette.primary.main, 0.16) },
         },
       },
     },
@@ -64,7 +64,7 @@ const theme = createTheme({
       defaultProps: { elevation: 0 },
       styleOverrides: {
         root: {
-          border: `1px solid ${palette.divider}`,
+          border: `1px solid ${appPalette.divider}`,
           backgroundImage: "none",
           boxShadow: "0 4px 18px rgba(15, 23, 42, 0.045)",
         },
@@ -79,24 +79,24 @@ const theme = createTheme({
         root: {
           minHeight: 44,
           transition: "background-color 180ms ease, box-shadow 180ms ease",
-          "&.Mui-focused": { boxShadow: `0 0 0 3px ${alpha(palette.primary.main, 0.14)}` },
+          "&.Mui-focused": { boxShadow: `0 0 0 3px ${alpha(appPalette.primary.main, 0.14)}` },
         },
-        notchedOutline: { borderColor: palette.divider },
+        notchedOutline: { borderColor: appPalette.divider },
       },
     },
     MuiTableHead: {
-      styleOverrides: { root: { backgroundColor: "#F1F5F9" } },
+      styleOverrides: { root: { backgroundColor: alpha(appPalette.primary.main, appPalette.mode === "dark" ? 0.18 : 0.08) } },
     },
     MuiTableCell: {
       styleOverrides: {
-        root: { borderBottomColor: palette.divider },
-        head: { color: palette.text.primary, fontWeight: 700, whiteSpace: "nowrap" },
+        root: { borderBottomColor: appPalette.divider },
+        head: { color: appPalette.text.primary, fontWeight: 700, whiteSpace: "nowrap" },
       },
     },
     MuiDialog: {
       styleOverrides: {
         paper: {
-          border: "1px solid rgba(0, 0, 0, 0.12)",
+          border: `1px solid ${appPalette.divider}`,
           borderRadius: 8,
         },
       },
@@ -104,5 +104,7 @@ const theme = createTheme({
     MuiTooltip: { defaultProps: { arrow: true, enterDelay: 500 } },
   },
 });
+
+const theme = createAppTheme(palette);
 
 export default theme;

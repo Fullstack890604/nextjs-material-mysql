@@ -15,6 +15,7 @@ import {
   DialogContent,
   DialogTitle,
   Divider,
+  Fab,
   IconButton,
   InputAdornment,
   ListItemIcon,
@@ -35,6 +36,7 @@ import {
   Lock,
   LockOpen,
   Key,
+  Palette,
   Visibility,
   VisibilityOff,
   Dashboard,
@@ -44,6 +46,8 @@ import {
 } from "@mui/icons-material";
 import { useAuth } from "@/context/AuthContext";
 import { useSearch } from "@/context/SearchContext";
+import { useThemeSelection } from "@/components/AppThemeProvider";
+import { themeOptions } from "@/themePresets";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import DialogCloseButton from "@/components/DialogCloseButton";
 
@@ -67,9 +71,11 @@ const getInitials = (name) => {
 export default function TopNav({ onToggleSidebar }) {
   const router = useRouter();
   const { user, logout } = useAuth();
+  const { themeKey, selectTheme } = useThemeSelection();
 
   const [notifAnchor, setNotifAnchor] = useState(null);
   const [menuAnchor, setMenuAnchor] = useState(null);
+  const [themeAnchor, setThemeAnchor] = useState(null);
 
   // Tìm kiếm trên TopNav - giá trị & placeholder do trang hiện tại quyết định (usePageSearch)
   const { searchValue, setSearchValue, placeholder: searchPlaceholder } = useSearch();
@@ -162,6 +168,7 @@ export default function TopNav({ onToggleSidebar }) {
         sx={{
           justifyContent: "space-between",
           minHeight: 64,
+          position: "relative",
           borderBottom: 1,
           borderColor: "divider",
         }}
@@ -245,7 +252,10 @@ export default function TopNav({ onToggleSidebar }) {
             onChange={(e) => setSearchValue(e.target.value)}
             sx={{
               display: { xs: "none", sm: "flex" },
-              width: { sm: 200, md: 320 },
+              position: { xs: "static", sm: "absolute" },
+              left: { sm: 72, md: 88 },
+              transform: "none",
+              width: { sm: 240, md: 320 },
               "& .MuiOutlinedInput-root": {
                 borderRadius: 999,
                 bgcolor: "action.hover",
@@ -340,6 +350,69 @@ export default function TopNav({ onToggleSidebar }) {
               <Search />
             </IconButton>
           )}
+
+          {/* Chọn theme */}
+          <IconButton
+            onClick={(e) => setThemeAnchor(e.currentTarget)}
+            aria-label="Chọn giao diện"
+            aria-controls={themeAnchor ? "theme-menu" : undefined}
+            aria-haspopup="true"
+            sx={{
+              display: "none",
+              bgcolor: "action.hover",
+              "&:hover": { bgcolor: "action.selected" },
+            }}
+          >
+            <Palette />
+          </IconButton>
+          <Menu
+            id="theme-menu"
+            anchorEl={themeAnchor}
+            open={Boolean(themeAnchor)}
+            onClose={() => setThemeAnchor(null)}
+            anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+            transformOrigin={{ vertical: "top", horizontal: "right" }}
+            slotProps={{
+              paper: {
+                sx: {
+                  width: 260,
+                  mt: 1,
+                  "& .MuiMenu-list": {
+                    display: "grid",
+                    gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+                    gap: 0.5,
+                    p: 1,
+                  },
+                  "& .theme-menu-heading": { gridColumn: "1 / -1" },
+                },
+              },
+            }}
+          >
+            <MenuItem className="theme-menu-heading" disabled sx={{ opacity: 1, fontWeight: 700, color: "text.primary" }}>
+              <ListItemIcon>
+                <Palette fontSize="small" />
+              </ListItemIcon>
+              Giao diện
+            </MenuItem>
+            {themeOptions.map((option) => (
+              <MenuItem
+                key={option.key}
+                selected={themeKey === option.key}
+                onClick={() => {
+                  selectTheme(option.key);
+                  setThemeAnchor(null);
+                }}
+              >
+                <ListItemIcon>
+                  <Box
+                    aria-hidden="true"
+                    sx={{ width: 16, height: 16, borderRadius: "50%", bgcolor: option.color, border: 1, borderColor: "divider" }}
+                  />
+                </ListItemIcon>
+                {option.label}
+              </MenuItem>
+            ))}
+          </Menu>
 
           {/* Chuông thông báo */}
           <IconButton
@@ -451,6 +524,29 @@ export default function TopNav({ onToggleSidebar }) {
         </Box>
       </Toolbar>
     </AppBar>
+
+    {/* Nút chọn theme nổi trên mobile */}
+    <Fab
+      size="medium"
+      color="primary"
+      aria-label="Chọn giao diện"
+      aria-controls={themeAnchor ? "theme-menu" : undefined}
+      aria-haspopup="true"
+      onClick={(e) => setThemeAnchor(e.currentTarget)}
+      sx={{
+        display: "flex",
+        position: "fixed",
+        right: 12,
+        top: "50%",
+        transform: "translateY(-50%)",
+        zIndex: (theme) => theme.zIndex.appBar + 1,
+        minHeight: 44,
+        width: 44,
+        height: 44,
+      }}
+    >
+      <Palette />
+    </Fab>
 
       {/* Dialog đổi mật khẩu */}
       <Dialog

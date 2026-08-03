@@ -1,11 +1,9 @@
 import "./globals.css";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
-import { ThemeProvider } from "@mui/material/styles";
-import CssBaseline from "@mui/material/CssBaseline";
-import theme from "@/theme";
 import { palette } from "@/palette";
 import { AuthProvider } from "@/context/AuthContext";
 import { ToastProvider } from "@/context/ToastContext";
+import AppThemeProvider from "@/components/AppThemeProvider";
 
 export const metadata = {
   title: "NextJS - Material UI",
@@ -46,12 +44,11 @@ export default function RootLayout({ children }) {
           </div>
         </noscript>
         <AppRouterCacheProvider options={{ key: "mui" }}>
-          <ThemeProvider theme={theme}>
-            <CssBaseline />
+          <AppThemeProvider>
             <AuthProvider>
               <ToastProvider>{children}</ToastProvider>
             </AuthProvider>
-          </ThemeProvider>
+          </AppThemeProvider>
         </AppRouterCacheProvider>
       </body>
     </html>
