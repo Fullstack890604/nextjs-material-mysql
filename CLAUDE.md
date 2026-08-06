@@ -177,7 +177,7 @@ Several tables (`Patient`, `Appointment`…) key off `LocationCode` — see `dat
   - `src/components/AppThemeProvider.jsx` owns the client-side theme state and persists it as `localStorage["app-theme"]`.
   - `src/theme.js` now exports `createAppTheme(appPalette)` so the same component rules are reused by every palette.
 - Added a standalone theme picker to `TopNav` using a two-column menu. The picker is a floating circular `Fab` centered on the right edge for both desktop and mobile; the duplicate TopNav theme button is hidden.
-- The current visible theme choices are modern/light-oriented: `Neutral`, `Blue`, `Indigo`, `Ocean`, `Rose`, `Mint`, `Lilac`, `Sky`, and `Lemon`. New users default to `Ocean`; a valid previous choice is preserved.
+- **Theme list (2026-08-06 — replaced the old set):** `src/themePresets.js` now defines exactly 14 light palettes, tông giữa chứ không đậm — `slate`, `blue`, `sky`, `ocean`, `teal`, `emerald`, `olive`, `honey`, `peach`, `rose`, `pink`, `orchid`, `violet`, `indigo` (nhãn tiếng Việt trong `themeOptions`). Mặc định là hằng số `DEFAULT_THEME_KEY` (`sky`), dùng luôn cho `AppThemeProvider`; lựa chọn cũ trong `localStorage` không còn trong danh sách thì tự rơi về mặc định. Khi thêm bảng màu mới: `primary.main` và `secondary.main` **phải đủ tương phản với chữ trắng** vì tiêu đề Dialog ở các trang đặt cứng `color: "#fff"` trên hai màu này (và header bảng dùng `primary.contrastText`) — đừng dùng pastel cho `main`, hãy để pastel ở `light`. Mực chữ lấy từ hằng số `coolText`/`warmText` thay vì tự đặt màu gần đen cho từng bảng.
 - Added responsive search positioning in `TopNav`; desktop search is left-aligned after the menu area, while mobile keeps the expandable search behavior.
 - Fixed the theme hydration mismatch by rendering a neutral pre-hydration splash, then reading `localStorage` after mount. This avoids both the yellow-theme flash and server/client MUI class mismatches.
 
@@ -199,5 +199,5 @@ Several tables (`Patient`, `Appointment`…) key off `LocationCode` — see `dat
 
 1. Fix or restore `src/app/api/auth/login/route.js` so `npm run build` completes successfully.
 2. Run the app and visually verify the staff table, TopNav search, floating theme picker, and all theme choices at desktop and mobile breakpoints.
-3. Check the remaining legacy palette definitions in `src/themePresets.js`; remove unused hidden presets if they are no longer needed, while preserving the `localStorage` fallback for invalid old keys.
-4. If the theme list grows further, add a small theme search or grouping rather than extending the two-column menu indefinitely.
+3. ~~Dọn các bảng màu cũ trong `src/themePresets.js`~~ — đã thay toàn bộ bằng 14 bảng mới (2026-08-06); các key ẩn/tối (`retro`, `midnight`, `coffee`, `lavender`, `sunset`, `mint`, `lilac`, `lemon`, `neutral`) đã bị xoá hẳn.
+4. If the theme list grows further, add a small theme search or grouping rather than extending the two-column menu indefinitely (menu hiện đã `maxHeight: 70vh` + cuộn).

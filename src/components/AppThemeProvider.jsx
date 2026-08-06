@@ -4,7 +4,7 @@ import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import { createAppTheme } from "@/theme";
-import { themeOptions, themePresets } from "@/themePresets";
+import { DEFAULT_THEME_KEY, themeOptions, themePresets } from "@/themePresets";
 
 const ThemeSelectionContext = createContext(null);
 
@@ -15,7 +15,7 @@ export function useThemeSelection() {
 }
 
 export default function AppThemeProvider({ children }) {
-  const [themeKey, setThemeKey] = useState("ocean");
+  const [themeKey, setThemeKey] = useState(DEFAULT_THEME_KEY);
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {

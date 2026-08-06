@@ -381,7 +381,10 @@ export default function TopNav({ onToggleSidebar, sidebarOpen = true }) {
             slotProps={{
               paper: {
                 sx: {
-                  width: 260,
+                  width: 280,
+                  // 14 bảng màu xếp 2 cột -> giới hạn chiều cao rồi cho cuộn, thay vì
+                  // để menu dài quá màn hình.
+                  maxHeight: "70vh",
                   mt: 1,
                   "& .MuiMenu-list": {
                     display: "grid",
@@ -390,6 +393,7 @@ export default function TopNav({ onToggleSidebar, sidebarOpen = true }) {
                     p: 1,
                   },
                   "& .theme-menu-heading": { gridColumn: "1 / -1" },
+                  "& .MuiMenuItem-root": { borderRadius: 1, fontSize: 14 },
                 },
               },
             }}
@@ -409,7 +413,7 @@ export default function TopNav({ onToggleSidebar, sidebarOpen = true }) {
                   setThemeAnchor(null);
                 }}
               >
-                <ListItemIcon>
+                <ListItemIcon sx={{ minWidth: 28 }}>
                   <Box
                     aria-hidden="true"
                     sx={{ width: 16, height: 16, borderRadius: "50%", bgcolor: option.color, border: 1, borderColor: "divider" }}

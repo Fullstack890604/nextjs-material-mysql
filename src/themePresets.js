@@ -1,5 +1,21 @@
 import { palette as basePalette } from "@/palette";
 
+/**
+ * Bộ giao diện của app — 14 bảng màu sáng, tông vừa phải (không quá đậm, không
+ * chói). Nguyên tắc chung cho mỗi bảng:
+ *
+ * - `primary.main` / `secondary.main` luôn đủ tương phản với chữ trắng, vì tiêu đề
+ *   Dialog ở các trang đang đặt cứng `color: "#fff"` trên nền hai màu này (và header
+ *   bảng dùng `primary.contrastText`). Vì vậy màu chính nằm ở tông giữa — sáng hơn
+ *   bộ cũ nhưng vẫn đọc được chữ trắng — chứ không phải pastel.
+ * - `light` dùng cho chấm màu / viền nhạt, `dark` chỉ dùng cho trạng thái hover.
+ * - `background.default` là sắc thái nhạt nhất của cùng tông màu, `paper` luôn trắng.
+ * - Chữ dùng mực xám-lạnh (#1E293B) cho tông lạnh và xám-ấm (#292524) cho tông ấm,
+ *   thay cho mực gần đen của bộ cũ.
+ * - Màu trạng thái (success/warning/info/error) giữ nguyên ở mọi bảng để Chip trạng
+ *   thái không đổi nghĩa khi người dùng đổi giao diện.
+ */
+
 const statusColors = {
   warning: basePalette.warning,
   info: basePalette.info,
@@ -7,153 +23,156 @@ const statusColors = {
   error: basePalette.error,
 };
 
+/** Mực chữ dùng chung — tông lạnh và tông ấm. */
+const coolText = { primary: "#1E293B", secondary: "#64748B", disabled: "#94A3B8" };
+const warmText = { primary: "#292524", secondary: "#78716C", disabled: "#A8A29E" };
+
 export const themePresets = {
-  retro: {
+  slate: {
     ...basePalette,
-    primary: { main: "#C2410C", light: "#EA580C", dark: "#9A3412", contrastText: "#FFFFFF" },
-    secondary: { main: "#D97706", light: "#F59E0B", dark: "#B45309", contrastText: "#FFFFFF" },
-    background: { default: "#FFF7ED", paper: "#FFFFFF" },
-    text: { primary: "#431407", secondary: "#7C2D12", disabled: "#A8A29E" },
-    divider: "#FED7AA",
-    ...statusColors,
-  },
-  neutral: {
-    ...basePalette,
-    primary: { main: "#475569", light: "#64748B", dark: "#334155", contrastText: "#FFFFFF" },
-    secondary: { main: "#64748B", light: "#94A3B8", dark: "#475569", contrastText: "#FFFFFF" },
+    primary: { main: "#64748B", light: "#94A3B8", dark: "#475569", contrastText: "#FFFFFF" },
+    secondary: { main: "#0284C7", light: "#38BDF8", dark: "#0369A1", contrastText: "#FFFFFF" },
     background: { default: "#F8FAFC", paper: "#FFFFFF" },
-    text: { primary: "#0F172A", secondary: "#475569", disabled: "#94A3B8" },
+    text: coolText,
     divider: "#E2E8F0",
     ...statusColors,
   },
   blue: {
     ...basePalette,
-    primary: { main: "#2563EB", light: "#3B82F6", dark: "#1D4ED8", contrastText: "#FFFFFF" },
-    secondary: { main: "#EA580C", light: "#F97316", dark: "#C2410C", contrastText: "#FFFFFF" },
-    background: { default: "#F8FAFC", paper: "#FFFFFF" },
-    text: { primary: "#1E293B", secondary: "#475569", disabled: "#94A3B8" },
+    primary: { main: "#2563EB", light: "#60A5FA", dark: "#1D4ED8", contrastText: "#FFFFFF" },
+    secondary: { main: "#0E7490", light: "#22D3EE", dark: "#155E75", contrastText: "#FFFFFF" },
+    background: { default: "#F5F9FF", paper: "#FFFFFF" },
+    text: coolText,
     divider: "#DBEAFE",
-    ...statusColors,
-  },
-  indigo: {
-    ...basePalette,
-    primary: { main: "#4F46E5", light: "#818CF8", dark: "#3730A3", contrastText: "#FFFFFF" },
-    secondary: { main: "#D97706", light: "#F59E0B", dark: "#B45309", contrastText: "#FFFFFF" },
-    background: { default: "#F8FAFC", paper: "#FFFFFF" },
-    text: { primary: "#1E1B4B", secondary: "#475569", disabled: "#94A3B8" },
-    divider: "#E0E7FF",
-    ...statusColors,
-  },
-  ocean: {
-    ...basePalette,
-    primary: { main: "#0891B2", light: "#22D3EE", dark: "#0E7490", contrastText: "#FFFFFF" },
-    secondary: { main: "#0369A1", light: "#0EA5E9", dark: "#075985", contrastText: "#FFFFFF" },
-    background: { default: "#ECFEFF", paper: "#FFFFFF" },
-    text: { primary: "#164E63", secondary: "#0E7490", disabled: "#94A3B8" },
-    divider: "#A5F3FC",
-    ...statusColors,
-  },
-  rose: {
-    ...basePalette,
-    primary: { main: "#BE123C", light: "#F43F5E", dark: "#9F1239", contrastText: "#FFFFFF" },
-    secondary: { main: "#DB2777", light: "#EC4899", dark: "#BE185D", contrastText: "#FFFFFF" },
-    background: { default: "#FFF1F2", paper: "#FFFFFF" },
-    text: { primary: "#4C0519", secondary: "#881337", disabled: "#A8A29E" },
-    divider: "#FECDD3",
-    ...statusColors,
-  },
-  midnight: {
-    ...basePalette,
-    mode: "dark",
-    primary: { main: "#60A5FA", light: "#93C5FD", dark: "#2563EB", contrastText: "#0F172A" },
-    secondary: { main: "#94A3B8", light: "#CBD5E1", dark: "#64748B", contrastText: "#0F172A" },
-    background: { default: "#0F172A", paper: "#1E293B" },
-    text: { primary: "#F8FAFC", secondary: "#CBD5E1", disabled: "#64748B" },
-    divider: "#334155",
-    ...statusColors,
-  },
-  lavender: {
-    ...basePalette,
-    primary: { main: "#7C3AED", light: "#A78BFA", dark: "#5B21B6", contrastText: "#FFFFFF" },
-    secondary: { main: "#C026D3", light: "#E879F9", dark: "#A21CAF", contrastText: "#FFFFFF" },
-    background: { default: "#FAF5FF", paper: "#FFFFFF" },
-    text: { primary: "#2E1065", secondary: "#6B21A8", disabled: "#A8A29E" },
-    divider: "#E9D5FF",
-    ...statusColors,
-  },
-  coffee: {
-    ...basePalette,
-    primary: { main: "#78350F", light: "#A16207", dark: "#451A03", contrastText: "#FFFFFF" },
-    secondary: { main: "#B45309", light: "#D97706", dark: "#92400E", contrastText: "#FFFFFF" },
-    background: { default: "#FFFBEB", paper: "#FFFFFF" },
-    text: { primary: "#451A03", secondary: "#78350F", disabled: "#A8A29E" },
-    divider: "#FDE68A",
-    ...statusColors,
-  },
-  sunset: {
-    ...basePalette,
-    primary: { main: "#E11D48", light: "#FB7185", dark: "#9F1239", contrastText: "#FFFFFF" },
-    secondary: { main: "#EA580C", light: "#FB923C", dark: "#C2410C", contrastText: "#FFFFFF" },
-    background: { default: "#FFF1F2", paper: "#FFFFFF" },
-    text: { primary: "#4C0519", secondary: "#881337", disabled: "#A8A29E" },
-    divider: "#FECDD3",
     ...statusColors,
   },
   sky: {
     ...basePalette,
     primary: { main: "#0284C7", light: "#38BDF8", dark: "#0369A1", contrastText: "#FFFFFF" },
-    secondary: { main: "#0EA5E9", light: "#7DD3FC", dark: "#0284C7", contrastText: "#FFFFFF" },
+    secondary: { main: "#6366F1", light: "#A5B4FC", dark: "#4F46E5", contrastText: "#FFFFFF" },
     background: { default: "#F0F9FF", paper: "#FFFFFF" },
-    text: { primary: "#0C4A6E", secondary: "#0369A1", disabled: "#94A3B8" },
+    text: coolText,
     divider: "#BAE6FD",
     ...statusColors,
   },
-  mint: {
+  ocean: {
+    ...basePalette,
+    primary: { main: "#0E7490", light: "#22D3EE", dark: "#155E75", contrastText: "#FFFFFF" },
+    secondary: { main: "#2563EB", light: "#60A5FA", dark: "#1D4ED8", contrastText: "#FFFFFF" },
+    background: { default: "#ECFEFF", paper: "#FFFFFF" },
+    text: coolText,
+    divider: "#A5F3FC",
+    ...statusColors,
+  },
+  teal: {
     ...basePalette,
     primary: { main: "#0F766E", light: "#2DD4BF", dark: "#115E59", contrastText: "#FFFFFF" },
-    secondary: { main: "#14B8A6", light: "#5EEAD4", dark: "#0F766E", contrastText: "#0F172A" },
+    secondary: { main: "#0284C7", light: "#38BDF8", dark: "#0369A1", contrastText: "#FFFFFF" },
     background: { default: "#F0FDFA", paper: "#FFFFFF" },
-    text: { primary: "#134E4A", secondary: "#0F766E", disabled: "#94A3B8" },
+    text: coolText,
     divider: "#99F6E4",
+    ...statusColors,
+  },
+  emerald: {
+    ...basePalette,
+    primary: { main: "#047857", light: "#34D399", dark: "#065F46", contrastText: "#FFFFFF" },
+    secondary: { main: "#4D7C0F", light: "#A3E635", dark: "#3F6212", contrastText: "#FFFFFF" },
+    background: { default: "#ECFDF5", paper: "#FFFFFF" },
+    text: coolText,
+    divider: "#A7F3D0",
+    ...statusColors,
+  },
+  olive: {
+    ...basePalette,
+    primary: { main: "#4D7C0F", light: "#A3E635", dark: "#3F6212", contrastText: "#FFFFFF" },
+    secondary: { main: "#B45309", light: "#FBBF24", dark: "#92400E", contrastText: "#FFFFFF" },
+    background: { default: "#F7FEE7", paper: "#FFFFFF" },
+    text: warmText,
+    divider: "#D9F99D",
+    ...statusColors,
+  },
+  honey: {
+    ...basePalette,
+    primary: { main: "#B45309", light: "#FBBF24", dark: "#92400E", contrastText: "#FFFFFF" },
+    secondary: { main: "#4D7C0F", light: "#A3E635", dark: "#3F6212", contrastText: "#FFFFFF" },
+    background: { default: "#FFFBEB", paper: "#FFFFFF" },
+    text: warmText,
+    divider: "#FDE68A",
     ...statusColors,
   },
   peach: {
     ...basePalette,
     primary: { main: "#C2410C", light: "#FB923C", dark: "#9A3412", contrastText: "#FFFFFF" },
-    secondary: { main: "#EA580C", light: "#FDBA74", dark: "#C2410C", contrastText: "#FFFFFF" },
+    secondary: { main: "#B45309", light: "#FBBF24", dark: "#92400E", contrastText: "#FFFFFF" },
     background: { default: "#FFF7ED", paper: "#FFFFFF" },
-    text: { primary: "#431407", secondary: "#9A3412", disabled: "#A8A29E" },
+    text: warmText,
     divider: "#FED7AA",
     ...statusColors,
   },
-  lilac: {
+  rose: {
     ...basePalette,
-    primary: { main: "#6D28D9", light: "#A78BFA", dark: "#5B21B6", contrastText: "#FFFFFF" },
-    secondary: { main: "#8B5CF6", light: "#C4B5FD", dark: "#6D28D9", contrastText: "#FFFFFF" },
+    primary: { main: "#E11D48", light: "#FB7185", dark: "#BE123C", contrastText: "#FFFFFF" },
+    secondary: { main: "#C2410C", light: "#FB923C", dark: "#9A3412", contrastText: "#FFFFFF" },
+    background: { default: "#FFF1F2", paper: "#FFFFFF" },
+    text: warmText,
+    divider: "#FECDD3",
+    ...statusColors,
+  },
+  pink: {
+    ...basePalette,
+    primary: { main: "#DB2777", light: "#F472B6", dark: "#BE185D", contrastText: "#FFFFFF" },
+    secondary: { main: "#9333EA", light: "#C084FC", dark: "#7E22CE", contrastText: "#FFFFFF" },
+    background: { default: "#FDF2F8", paper: "#FFFFFF" },
+    text: warmText,
+    divider: "#FBCFE8",
+    ...statusColors,
+  },
+  orchid: {
+    ...basePalette,
+    primary: { main: "#C026D3", light: "#E879F9", dark: "#A21CAF", contrastText: "#FFFFFF" },
+    secondary: { main: "#DB2777", light: "#F472B6", dark: "#BE185D", contrastText: "#FFFFFF" },
+    background: { default: "#FDF4FF", paper: "#FFFFFF" },
+    text: coolText,
+    divider: "#F5D0FE",
+    ...statusColors,
+  },
+  violet: {
+    ...basePalette,
+    primary: { main: "#7C3AED", light: "#A78BFA", dark: "#6D28D9", contrastText: "#FFFFFF" },
+    secondary: { main: "#DB2777", light: "#F472B6", dark: "#BE185D", contrastText: "#FFFFFF" },
     background: { default: "#F5F3FF", paper: "#FFFFFF" },
-    text: { primary: "#2E1065", secondary: "#6D28D9", disabled: "#A8A29E" },
+    text: coolText,
     divider: "#DDD6FE",
     ...statusColors,
   },
-  lemon: {
+  indigo: {
     ...basePalette,
-    primary: { main: "#A16207", light: "#EAB308", dark: "#854D0E", contrastText: "#FFFFFF" },
-    secondary: { main: "#CA8A04", light: "#FACC15", dark: "#A16207", contrastText: "#1C1917" },
-    background: { default: "#FEFCE8", paper: "#FFFFFF" },
-    text: { primary: "#422006", secondary: "#713F12", disabled: "#A8A29E" },
-    divider: "#FEF08A",
+    primary: { main: "#6366F1", light: "#A5B4FC", dark: "#4F46E5", contrastText: "#FFFFFF" },
+    secondary: { main: "#0284C7", light: "#38BDF8", dark: "#0369A1", contrastText: "#FFFFFF" },
+    background: { default: "#EEF2FF", paper: "#FFFFFF" },
+    text: coolText,
+    divider: "#E0E7FF",
     ...statusColors,
   },
 };
 
+/** Danh sách hiện trong menu chọn giao diện — `color` là chấm màu xem trước. */
 export const themeOptions = [
-  { key: "neutral", label: "Neutral", color: "#475569" },
-  { key: "blue", label: "Blue", color: "#2563EB" },
-  { key: "indigo", label: "Indigo", color: "#4F46E5" },
-  { key: "ocean", label: "Ocean", color: "#0891B2" },
-  { key: "rose", label: "Rose", color: "#BE123C" },
-  { key: "mint", label: "Mint", color: "#2DD4BF" },
-  { key: "lilac", label: "Lilac", color: "#A78BFA" },
-  { key: "sky", label: "Sky", color: "#38BDF8" },
-  { key: "lemon", label: "Lemon", color: "#EAB308" },
+  { key: "slate", label: "Xám khói", color: "#64748B" },
+  { key: "blue", label: "Xanh dương", color: "#2563EB" },
+  { key: "sky", label: "Xanh trời", color: "#0284C7" },
+  { key: "ocean", label: "Xanh biển", color: "#0E7490" },
+  { key: "teal", label: "Xanh ngọc", color: "#0F766E" },
+  { key: "emerald", label: "Lục bảo", color: "#047857" },
+  { key: "olive", label: "Ô liu", color: "#4D7C0F" },
+  { key: "honey", label: "Mật ong", color: "#B45309" },
+  { key: "peach", label: "Cam đào", color: "#C2410C" },
+  { key: "rose", label: "Hồng đỏ", color: "#E11D48" },
+  { key: "pink", label: "Hồng phấn", color: "#DB2777" },
+  { key: "orchid", label: "Tím lan", color: "#C026D3" },
+  { key: "violet", label: "Tím", color: "#7C3AED" },
+  { key: "indigo", label: "Chàm", color: "#6366F1" },
 ];
+
+/** Giao diện mặc định cho người dùng mới / khi lựa chọn cũ không còn tồn tại. */
+export const DEFAULT_THEME_KEY = "sky";
