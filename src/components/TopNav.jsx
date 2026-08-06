@@ -28,7 +28,7 @@ import {
   Typography,
 } from "@mui/material";
 import {
-  Menu as MenuIcon,
+  MenuOpen as MenuOpenIcon,
   Notifications,
   Logout,
   KeyboardArrowDown,
@@ -68,7 +68,7 @@ const getInitials = (name) => {
     .join("");
 };
 
-export default function TopNav({ onToggleSidebar }) {
+export default function TopNav({ onToggleSidebar, sidebarOpen = true }) {
   const router = useRouter();
   const { user, logout } = useAuth();
   const { themeKey, selectTheme } = useThemeSelection();
@@ -183,7 +183,13 @@ export default function TopNav({ onToggleSidebar }) {
               "&:hover": { bgcolor: "action.selected" },
             }}
           >
-            <MenuIcon />
+            <MenuOpenIcon
+              sx={{
+                fontSize: 28,
+                transform: sidebarOpen ? "none" : "scaleX(-1)",
+                transition: "transform .2s ease",
+              }}
+            />
           </IconButton>
 
           {/* Logo thương hiệu (chỉ hiện trên mobile, desktop đã có ở sidebar); ẩn khi đang mở khung tìm kiếm mobile để nhường chỗ */}

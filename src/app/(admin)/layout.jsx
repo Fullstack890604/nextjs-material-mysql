@@ -87,6 +87,7 @@ export default function AdminLayout({ children }) {
           )}
           <Box sx={{ display: "flex", flex: 1, flexDirection: "column", overflow: "hidden" }}>
             <TopNav
+              sidebarOpen={isMobile ? mobileOpen : !collapsed}
               onToggleSidebar={() =>
                 isMobile
                   ? setMobileOpen((o) => !o)
