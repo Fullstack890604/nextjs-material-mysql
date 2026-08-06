@@ -149,6 +149,24 @@ export default function StatusesPage() {
     [filtered, page, rowsPerPage]
   );
 
+  // Số trạng thái đang thuộc mỗi loại — hiện làm dòng mô tả trong ô chọn loại trạng thái.
+  const statusCountByGroup = useMemo(() => {
+    const map = {};
+    rows.forEach((r) => {
+      if (r.groupCode) map[r.groupCode] = (map[r.groupCode] || 0) + 1;
+    });
+    return map;
+  }, [rows]);
+
+  /** Dòng mô tả của một loại trạng thái: mô tả sẵn có + số trạng thái đang dùng. */
+  const groupDescription = useCallback(
+    (g) =>
+      [g?.description, statusCountByGroup[g?.code] ? `${statusCountByGroup[g.code]} trạng thái` : null]
+        .filter(Boolean)
+        .join(" · "),
+    [statusCountByGroup]
+  );
+
   useEffect(() => {
     setPage(0);
   }, [search, groupFilter]);
@@ -272,12 +290,14 @@ export default function StatusesPage() {
           <AutocompleteField
             size="small"
             label="Loại trạng thái"
-            placeholder="Tất cả loại"
+            emptyOption="— Tất cả loại —"
             value={groupFilter}
             onChange={setGroupFilter}
             options={groups}
             optionCaption="code"
             searchFields={["code", "name", "description"]}
+            optionDescription={groupDescription}
+            popupMinWidth={360}
             startIcon={<Category fontSize="small" />}
             fullWidth={false}
             sx={{ maxWidth: 360, width: "100%" }}
@@ -408,35 +428,37 @@ export default function StatusesPage() {
             <Grid size={{ xs: 12 }}>
               <AutocompleteField
                 label="Loại trạng thái"
+                emptyOption="— Chọn loại trạng thái —"
                 value={form.groupCode}
                 onChange={(v) => setForm((f) => ({ ...f, groupCode: v }))}
                 options={groups}
                 optionCaption="code"
                 searchFields={["code", "name", "description"]}
+                optionDescription={groupDescription}
                 required
                 error={!form.groupCode}
-                helperText={!form.groupCode ? "Vui lòng chọn loại trạng thái" : ""}
                 startIcon={<Category fontSize="small" />}
               />
             </Grid>
             <Grid size={{ xs: 12, sm: 4 }}>
               <TextField label="Mã" value={form.code} onChange={setField("code")} fullWidth required
-                error={!form.code.trim()} helperText={!form.code.trim() ? "Vui lòng nhập mã" : ""}
+                error={!form.code.trim()}
                 slotProps={{ input: { startAdornment: (<InputAdornment position="start"><Tag fontSize="small" /></InputAdornment>) } }} />
             </Grid>
             <Grid size={{ xs: 12, sm: 8 }}>
               <TextField label="Tên trạng thái" value={form.name} onChange={setField("name")} fullWidth required
-                error={!form.name.trim()} helperText={!form.name.trim() ? "Vui lòng nhập tên trạng thái" : ""}
+                error={!form.name.trim()}
                 slotProps={{ input: { startAdornment: (<InputAdornment position="start"><Flag fontSize="small" /></InputAdornment>) } }} />
             </Grid>
             <Grid size={{ xs: 12 }}>
               <AutocompleteField
                 label="Màu hiển thị"
-                placeholder="Mặc định (xám)"
+                emptyOption="— Mặc định (xám) —"
                 value={form.color}
                 onChange={(v) => setForm((f) => ({ ...f, color: v }))}
                 options={COLOR_OPTIONS}
                 dotColor={(o) => o?.code}
+                optionDescription="code"
                 showDotInInput
                 startIcon={<Palette fontSize="small" />}
               />

@@ -423,26 +423,36 @@ export default function TeamsPage() {
           <Grid container spacing={2}>
             <Grid size={{ xs: 12, sm: 4 }}>
               <TextField label="Mã" value={form.code} onChange={setField("code")} fullWidth required disabled={!!editing}
-                error={!form.code.trim()} helperText={!form.code.trim() ? "Vui lòng nhập mã tổ, nhóm" : ""}
+                error={!form.code.trim()}
                 slotProps={{ input: { startAdornment: (<InputAdornment position="start"><Tag fontSize="small" /></InputAdornment>) } }} />
             </Grid>
             <Grid size={{ xs: 12, sm: 8 }}>
               <TextField label="Tên tổ, nhóm" value={form.name} onChange={setField("name")} fullWidth required
-                error={!form.name.trim()} helperText={!form.name.trim() ? "Vui lòng nhập tên tổ, nhóm" : ""}
+                error={!form.name.trim()}
                 slotProps={{ input: { startAdornment: (<InputAdornment position="start"><Groups fontSize="small" /></InputAdornment>) } }} />
             </Grid>
 
             <Grid size={{ xs: 12, sm: 5 }}>
               <AutocompleteField label="Phòng ban" value={form.departmentCode}
                 onChange={(v) => setForm((f) => ({ ...f, departmentCode: v }))}
-                options={departments} optionCaption="code" required
-                error={!form.departmentCode} helperText={!form.departmentCode ? "Vui lòng chọn phòng ban" : ""}
+                options={departments} optionCaption="code" required emptyOption="— Chọn phòng ban —"
+                optionDescription={(d) =>
+                  [d?.locationName, d?.managerName ? `TP: ${d.managerName}` : null, d?.description]
+                    .filter(Boolean)
+                    .join(" · ")
+                }
+                error={!form.departmentCode}
+                popupMinWidth={360}
                 startIcon={<AccountTree fontSize="small" />} />
             </Grid>
             <Grid size={{ xs: 12, sm: 4 }}>
               <AutocompleteField label="Tổ trưởng" value={form.leaderCode}
                 onChange={(v) => setForm((f) => ({ ...f, leaderCode: v }))}
-                options={staff} optionLabel="fullName" placeholder="Chưa phân công"
+                options={staff} optionLabel="fullName" emptyOption="— Chọn tổ trưởng —"
+                optionDescription={(s) =>
+                  [s?.code, s?.position, s?.departmentName].filter(Boolean).join(" · ")
+                }
+                popupMinWidth={360}
                 startIcon={<BadgeIcon fontSize="small" />} />
             </Grid>
             <Grid size={{ xs: 12, sm: 3 }}>

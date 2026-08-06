@@ -65,6 +65,21 @@ const COUNTRIES = [
     "Úc",
 ];
 
+/** Mã ISO + khu vực địa lý, dùng làm dòng mô tả dưới tên nước trong ô "Quốc gia". */
+const COUNTRY_INFO = {
+    "Việt Nam": "VN · Đông Nam Á",
+    "Lào": "LA · Đông Nam Á",
+    Campuchia: "KH · Đông Nam Á",
+    "Thái Lan": "TH · Đông Nam Á",
+    Singapore: "SG · Đông Nam Á",
+    Malaysia: "MY · Đông Nam Á",
+    "Hàn Quốc": "KR · Đông Á",
+    "Nhật Bản": "JP · Đông Á",
+    "Trung Quốc": "CN · Đông Á",
+    "Hoa Kỳ": "US · Bắc Mỹ",
+    Úc: "AU · Châu Đại Dương",
+};
+
 /** Màu theo miền của tỉnh/thành — đồng bộ với trang danh mục Tỉnh/Thành phố. */
 const REGION_COLORS = {
     "Miền Bắc": "#1565c0",
@@ -162,6 +177,27 @@ export default function LocationsPage() {
         () => filtered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
         [filtered, page, rowsPerPage],
     );
+
+    /** Tên các tỉnh/thành theo miền — làm dòng mô tả cho ô "Khu vực". */
+    const provincesByRegion = useMemo(() => {
+        const map = {};
+        provinces.forEach((p) => {
+            if (!p.region) return;
+            (map[p.region] ||= []).push(p.name);
+        });
+        return map;
+    }, [provinces]);
+
+    /** Số địa điểm đang dùng mỗi thành phố / quốc gia — hiện kèm trong dropdown. */
+    const usage = useMemo(() => {
+        const city = {};
+        const country = {};
+        rows.forEach((r) => {
+            if (r.city) city[r.city] = (city[r.city] || 0) + 1;
+            if (r.country) country[r.country] = (country[r.country] || 0) + 1;
+        });
+        return { city, country };
+    }, [rows]);
 
     useEffect(() => {
         setPage(0);
@@ -467,7 +503,6 @@ export default function LocationsPage() {
                                 required
                                 disabled={!!editing}
                                 error={!form.locationCode.trim()}
-                                helperText={!form.locationCode.trim() ? "Vui lòng nhập mã địa điểm" : ""}
                                 slotProps={{
                                     input: {
                                         startAdornment: (
@@ -487,7 +522,6 @@ export default function LocationsPage() {
                                 fullWidth
                                 required
                                 error={!form.locationName.trim()}
-                                helperText={!form.locationName.trim() ? "Vui lòng nhập tên địa điểm" : ""}
                                 slotProps={{
                                     input: {
                                         startAdornment: (
@@ -520,23 +554,38 @@ export default function LocationsPage() {
                             <AutocompleteField
                                 label="Khu vực"
                                 freeSolo
+                                emptyOption="— Chọn khu vực —"
                                 options={REGIONS}
                                 value={form.region}
                                 onChange={(val) => setForm((f) => ({ ...f, region: val }))}
                                 dotColor={(rg) => REGION_COLORS[rg]}
+                                optionDescription={(rg) => {
+                                    const names = provincesByRegion[rg];
+                                    if (!names?.length) return null;
+                                    return `${names.length} tỉnh/thành · ${names.slice(0, 3).join(", ")}${names.length > 3 ? "..." : ""}`;
+                                }}
                                 startIcon={<Public fontSize="small" />}
                             />
                         </Grid>
                         <Grid size={{ xs: 12, sm: 4 }}>
                             <AutocompleteField
                                 label="Thành phố"
-                                placeholder="Tìm kiếm tỉnh/thành..."
+                                emptyOption="— Chọn thành phố —"
                                 options={provinces}
                                 optionValue="name"
                                 value={form.city}
                                 onChange={(val) => setForm((f) => ({ ...f, city: val }))}
                                 searchFields={["code", "name", "region"]}
                                 dotColor={(p) => REGION_COLORS[p?.region]}
+                                optionDescription={(p) =>
+                                    [
+                                        p?.code,
+                                        p?.region,
+                                        usage.city[p?.name] ? `${usage.city[p.name]} địa điểm` : null,
+                                    ]
+                                        .filter(Boolean)
+                                        .join(" · ")
+                                }
                                 showDotInInput
                                 startIcon={<LocationCity fontSize="small" />}
                             />
@@ -545,10 +594,16 @@ export default function LocationsPage() {
                             <AutocompleteField
                                 label="Quốc gia"
                                 freeSolo
+                                emptyOption="— Chọn quốc gia —"
                                 options={COUNTRIES}
                                 value={form.country}
                                 onChange={(val) => setForm((f) => ({ ...f, country: val }))}
                                 dotColor="#757575"
+                                optionDescription={(c) =>
+                                    [COUNTRY_INFO[c], usage.country[c] ? `${usage.country[c]} địa điểm` : null]
+                                        .filter(Boolean)
+                                        .join(" · ")
+                                }
                                 startIcon={<Public fontSize="small" />}
                             />
                         </Grid>

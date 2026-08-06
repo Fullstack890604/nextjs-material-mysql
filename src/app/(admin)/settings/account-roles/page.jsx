@@ -2,13 +2,10 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
-  Autocomplete,
-  Avatar,
   Backdrop,
   Box,
   Button,
   Card,
-  Checkbox,
   Chip,
   CircularProgress,
   Dialog,
@@ -17,9 +14,6 @@ import {
   DialogTitle,
   Grid2 as Grid,
   IconButton,
-  InputAdornment,
-  ListItemText,
-  MenuItem,
   Stack,
   Table,
   TableBody,
@@ -27,7 +21,6 @@ import {
   TableHead,
   TablePagination,
   TableRow,
-  TextField,
   Tooltip,
   Typography,
 } from "@mui/material";
@@ -39,6 +32,7 @@ import {
   AdminPanelSettings,
   Edit,
 } from "@mui/icons-material";
+import AutocompleteField from "@/components/AutocompleteField";
 import PageHeader from "@/components/PageHeader";
 import { usePagePermissions } from "@/context/MenuContext";
 import { usePageSearch } from "@/context/SearchContext";
@@ -54,6 +48,10 @@ const headCellSx = {
   whiteSpace: "nowrap",
   py: 1.5,
 };
+
+/** Màu chấm trong danh sách chọn: tài khoản bị khóa / nhóm quyền đã ngưng thì xám. */
+const accountColor = (a) => (a?.locked ? "#9e9e9e" : "#2e7d32");
+const roleColor = (r) => (r?.isActive === false ? "#9e9e9e" : "#2e7d32");
 
 export default function AccountRolesPage() {
   const perms = usePagePermissions();
@@ -168,9 +166,6 @@ export default function AccountRolesPage() {
     setForm({ accountId: g.accountId, roleIds });
     setDialogOpen(true);
   };
-
-  const setField = (key) => (e) =>
-    setForm((f) => ({ ...f, [key]: e.target.value }));
 
   const handleSave = async () => {
     if (!form.accountId) return notify("Vui lòng chọn tài khoản", "warning");
@@ -426,104 +421,51 @@ export default function AccountRolesPage() {
         <DialogContent dividers>
           <Grid container spacing={2}>
             <Grid size={{ xs: 12 }}>
-              <Autocomplete
-                options={accounts}
+              <AutocompleteField
+                label="Tài khoản"
+                emptyOption="— Chọn tài khoản —"
                 disabled={!!editing}
-                value={accounts.find((a) => a.id === form.accountId) || null}
-                onChange={(e, val) =>
-                  setForm((f) => ({ ...f, accountId: val ? val.id : "" }))
+                value={form.accountId}
+                onChange={(v) => setForm((f) => ({ ...f, accountId: v }))}
+                options={accounts}
+                optionValue="id"
+                optionLabel="userName"
+                optionCaption="id"
+                searchFields={["id", "userName", "description"]}
+                optionDescription={(a) =>
+                  [a?.description, a?.locked ? "Đã khóa" : "Hoạt động"].filter(Boolean).join(" · ")
                 }
-                isOptionEqualToValue={(o, v) => o.id === v.id}
-                getOptionLabel={(a) => `${a.id} - ${a.userName}`}
-                filterOptions={(opts, { inputValue }) => {
-                  const q = inputValue.trim().toLowerCase();
-                  if (!q) return opts;
-                  return opts.filter(
-                    (a) =>
-                      String(a.id).includes(q) ||
-                      a.userName?.toLowerCase().includes(q) ||
-                      a.description?.toLowerCase().includes(q)
-                  );
-                }}
-                renderOption={(props, a) => {
-                  const { key, ...rest } = props;
-                  return (
-                    <Box
-                      component="li"
-                      key={a.id}
-                      {...rest}
-                      sx={{ display: "flex", alignItems: "flex-start", gap: 1.5, py: 1 }}
-                    >
-                      <Avatar sx={{ width: 34, height: 34, bgcolor: "#E8F1FF", color: "primary.main" }}>
-                        <Person fontSize="small" />
-                      </Avatar>
-                      <Box sx={{ minWidth: 0 }}>
-                        <Typography variant="body2" fontWeight={700}>
-                          {a.id} - {a.userName}
-                        </Typography>
-                        <Stack direction="row" spacing={1} alignItems="center" sx={{ mt: 0.25 }}>
-                          {a.description ? (
-                            <Chip
-                              label={a.description}
-                              size="small"
-                              color="info"
-                              variant="outlined"
-                              sx={{ height: 20, fontSize: 11 }}
-                            />
-                          ) : null}
-                          <Typography
-                            variant="caption"
-                            color={a.locked ? "error.main" : "success.main"}
-                          >
-                            {a.locked ? "Đã khóa" : "Hoạt động"}
-                          </Typography>
-                        </Stack>
-                      </Box>
-                    </Box>
-                  );
-                }}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label="Tài khoản"
-                    placeholder="Tìm kiếm tài khoản..."
-                    required
-                    InputProps={{
-                      ...params.InputProps,
-                      startAdornment: (
-                        <>
-                          <InputAdornment position="start">
-                            <Person fontSize="small" />
-                          </InputAdornment>
-                          {params.InputProps.startAdornment}
-                        </>
-                      ),
-                    }}
-                  />
-                )}
+                dotColor={accountColor}
+                showDotInInput
+                required
+                error={!form.accountId}
+                noOptionsText="Không tìm thấy tài khoản"
+                popupMinWidth={552}
+                startIcon={<Person fontSize="small" />}
               />
             </Grid>
             <Grid size={{ xs: 12 }}>
-              <TextField select label="Nhóm quyền" value={form.roleIds} onChange={setField("roleIds")} fullWidth required
-                slotProps={{ input: { startAdornment: (<InputAdornment position="start"><AdminPanelSettings fontSize="small" /></InputAdornment>) } }}
-                SelectProps={{
-                  multiple: true,
-                  renderValue: (selected) => (
-                    <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-                      {selected.map((id) => {
-                        const role = roles.find((r) => r.id === id);
-                        return <Chip key={id} label={role ? role.name : id} size="small" />;
-                      })}
-                    </Box>
-                  ),
-                }}>
-                {roles.map((r) => (
-                  <MenuItem key={r.id} value={r.id}>
-                    <Checkbox checked={form.roleIds.includes(r.id)} />
-                    <ListItemText primary={r.name} />
-                  </MenuItem>
-                ))}
-              </TextField>
+              <AutocompleteField
+                label="Nhóm quyền"
+                placeholder={form.roleIds.length ? "" : "Chọn một hoặc nhiều nhóm quyền..."}
+                multiple
+                disableCloseOnSelect
+                value={form.roleIds}
+                onChange={(ids) => setForm((f) => ({ ...f, roleIds: ids }))}
+                options={roles}
+                optionValue="id"
+                optionLabel="name"
+                searchFields={["name", "description"]}
+                optionDescription={(r) =>
+                  [r?.description, r?.isActive === false ? "Đã ngưng" : null].filter(Boolean).join(" · ")
+                }
+                dotColor={roleColor}
+                required
+                error={!form.roleIds.length}
+                noOptionsText="Không tìm thấy nhóm quyền"
+                popupMinWidth={552}
+                startIcon={<AdminPanelSettings fontSize="small" />}
+              />
             </Grid>
           </Grid>
         </DialogContent>

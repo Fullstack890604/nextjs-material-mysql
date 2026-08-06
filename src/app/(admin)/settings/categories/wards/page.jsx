@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useMemo, useState, Fragment } from "react";
 import {
-  Autocomplete,
   Backdrop,
   Box,
   Button,
@@ -45,6 +44,7 @@ import {
 import { useAuth } from "@/context/AuthContext";
 import { usePagePermissions } from "@/context/MenuContext";
 import { usePageSearch } from "@/context/SearchContext";
+import AutocompleteField from "@/components/AutocompleteField";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import DialogCloseButton from "@/components/DialogCloseButton";
 import PageHeader from "@/components/PageHeader";
@@ -57,24 +57,6 @@ const REGION_COLORS = {
   "Tây Nguyên": "#6a1b9a",
   "Miền Nam": "#2e7d32",
 };
-
-/** Chấm màu nhỏ đứng trước nhãn trong danh sách chọn. */
-function Dot({ color }) {
-  return (
-    <Box
-      component="span"
-      sx={{
-        display: "inline-block",
-        width: 8,
-        height: 8,
-        borderRadius: "50%",
-        bgcolor: color || "#757575",
-        mr: 1,
-        flexShrink: 0,
-      }}
-    />
-  );
-}
 
 const emptyForm = {
   code: "",
@@ -121,11 +103,28 @@ export default function WardsPage() {
     [provinces]
   );
 
-  // Tỉnh/thành đang chọn trong dialog — dùng cho value của Autocomplete và chấm màu ở ô đã chọn.
-  const selectedProvince = useMemo(
-    () => provinces.find((p) => p.code === form.provinceCode) || null,
-    [provinces, form.provinceCode]
-  );
+  // Số phường/xã đang thuộc mỗi tỉnh/thành — hiện làm dòng mô tả trong ô chọn tỉnh/thành.
+  const wardCountByProvince = useMemo(() => {
+    const map = {};
+    rows.forEach((r) => {
+      if (r.provinceCode) map[r.provinceCode] = (map[r.provinceCode] || 0) + 1;
+    });
+    return map;
+  }, [rows]);
+
+  // Quận/huyện gợi ý = những giá trị đã nhập trong dữ liệu, thu hẹp theo tỉnh/thành đang
+  // chọn. Ô vẫn cho gõ tự do (freeSolo) nên nhập quận/huyện mới vẫn được.
+  const districtOptions = useMemo(() => {
+    const map = new Map();
+    rows.forEach((r) => {
+      if (!r.district) return;
+      if (form.provinceCode && r.provinceCode !== form.provinceCode) return;
+      map.set(r.district, (map.get(r.district) || 0) + 1);
+    });
+    return Array.from(map, ([district, count]) => ({ district, count })).sort((a, b) =>
+      a.district.localeCompare(b.district, "vi")
+    );
+  }, [rows, form.provinceCode]);
 
   const loadProvinces = useCallback(async () => {
     try {
@@ -441,7 +440,7 @@ export default function WardsPage() {
       </Card>
 
       {/* Dialog thêm/sửa */}
-      <Dialog open={dialogOpen} onClose={(e, reason) => reason !== "backdropClick" && setDialogOpen(false)} maxWidth="sm" fullWidth>
+      <Dialog open={dialogOpen} onClose={(e, reason) => reason !== "backdropClick" && setDialogOpen(false)} maxWidth="md" fullWidth>
         <DialogTitle
           sx={{
             fontWeight: 700,
@@ -459,62 +458,53 @@ export default function WardsPage() {
         <DialogContent dividers>
           <Grid container spacing={2}>
             <Grid size={{ xs: 12, sm: 6 }}>
-              <Autocomplete
+              <AutocompleteField
+                label="Tỉnh / Thành phố"
+                emptyOption="— Chọn tỉnh / thành phố —"
+                value={form.provinceCode}
+                onChange={(v) => setForm((f) => ({ ...f, provinceCode: v }))}
                 options={provinces}
-                value={selectedProvince}
-                onChange={(e, val) => setForm((f) => ({ ...f, provinceCode: val ? val.code : "" }))}
-                isOptionEqualToValue={(o, v) => o.code === v.code}
-                getOptionLabel={(p) => p.name || ""}
+                searchFields={["code", "name", "region"]}
+                dotColor={(p) => REGION_COLORS[p?.region]}
+                optionDescription={(p) =>
+                  [
+                    p?.code,
+                    p?.region,
+                    wardCountByProvince[p?.code] ? `${wardCountByProvince[p.code]} phường / xã` : null,
+                  ]
+                    .filter(Boolean)
+                    .join(" · ")
+                }
+                showDotInInput
+                required
+                error={!form.provinceCode}
                 noOptionsText="Không tìm thấy tỉnh / thành phố"
-                renderOption={(props, p) => {
-                  const { key, ...rest } = props;
-                  return (
-                    <Box component="li" key={p.code} {...rest} sx={{ display: "flex", alignItems: "center" }}>
-                      <Dot color={REGION_COLORS[p.region]} />
-                      {p.name}
-                    </Box>
-                  );
-                }}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label="Tỉnh / Thành phố"
-                    required
-                    error={!form.provinceCode}
-                    helperText={!form.provinceCode ? "Vui lòng chọn tỉnh / thành phố" : ""}
-                    slotProps={{
-                      input: {
-                        ...params.InputProps,
-                        startAdornment: (
-                          <>
-                            <InputAdornment position="start">
-                              {selectedProvince ? (
-                                <Dot color={REGION_COLORS[selectedProvince.region]} />
-                              ) : (
-                                <MapIcon fontSize="small" />
-                              )}
-                            </InputAdornment>
-                            {params.InputProps.startAdornment}
-                          </>
-                        ),
-                      },
-                    }}
-                  />
-                )}
+                startIcon={<MapIcon fontSize="small" />}
               />
             </Grid>
             <Grid size={{ xs: 12, sm: 6 }}>
-              <TextField label="Quận / Huyện" value={form.district} onChange={setField("district")} fullWidth
-                slotProps={{ input: { startAdornment: (<InputAdornment position="start"><Domain fontSize="small" /></InputAdornment>) } }} />
+              <AutocompleteField
+                label="Quận / Huyện"
+                freeSolo
+                emptyOption="— Chọn quận / huyện —"
+                value={form.district}
+                onChange={(v) => setForm((f) => ({ ...f, district: v }))}
+                options={districtOptions}
+                optionValue="district"
+                optionLabel="district"
+                optionDescription={(d) => (d?.count ? `${d.count} phường / xã` : "")}
+                noOptionsText="Chưa có quận / huyện nào — gõ để thêm mới"
+                startIcon={<Domain fontSize="small" />}
+              />
             </Grid>
             <Grid size={{ xs: 12, sm: 4 }}>
               <TextField label="Mã" value={form.code} onChange={setField("code")} fullWidth required disabled={!!editing}
-                error={!form.code.trim()} helperText={!form.code.trim() ? "Vui lòng nhập mã phường / xã" : ""}
+                error={!form.code.trim()}
                 slotProps={{ input: { startAdornment: (<InputAdornment position="start"><Tag fontSize="small" /></InputAdornment>) } }} />
             </Grid>
             <Grid size={{ xs: 12, sm: 8 }}>
               <TextField label="Tên phường / xã" value={form.name} onChange={setField("name")} fullWidth required
-                error={!form.name.trim()} helperText={!form.name.trim() ? "Vui lòng nhập tên phường / xã" : ""}
+                error={!form.name.trim()}
                 slotProps={{ input: { startAdornment: (<InputAdornment position="start"><Place fontSize="small" /></InputAdornment>) } }} />
             </Grid>
             <Grid size={{ xs: 12 }}>

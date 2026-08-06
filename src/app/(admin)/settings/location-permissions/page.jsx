@@ -2,13 +2,10 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
-  Autocomplete,
-  Avatar,
   Backdrop,
   Box,
   Button,
   Card,
-  Checkbox,
   Chip,
   CircularProgress,
   Dialog,
@@ -39,13 +36,12 @@ import {
   Person,
   Place,
   Notes,
-  CheckBoxOutlineBlank,
-  CheckBox as CheckBoxIcon,
 } from "@mui/icons-material";
 import { useAuth } from "@/context/AuthContext";
 import { usePagePermissions } from "@/context/MenuContext";
 import { usePageSearch } from "@/context/SearchContext";
 import { useToast } from "@/context/ToastContext";
+import AutocompleteField from "@/components/AutocompleteField";
 import PageHeader from "@/components/PageHeader";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import DialogCloseButton from "@/components/DialogCloseButton";
@@ -60,6 +56,10 @@ const headCellSx = {
 };
 
 const emptyForm = { accountId: "", locationCodes: [], locked: false, notes: "" };
+
+/** Màu chấm trong danh sách chọn: tài khoản bị khóa / địa điểm đã ẩn thì xám. */
+const accountColor = (a) => (a?.locked ? "#9e9e9e" : "#2e7d32");
+const locationColor = (l) => (l?.isActive === false ? "#9e9e9e" : "#2e7d32");
 
 export default function LocationPermissionsPage() {
   const { user } = useAuth();
@@ -378,133 +378,50 @@ export default function LocationPermissionsPage() {
         <DialogContent dividers>
           <Grid container spacing={2}>
             <Grid size={{ xs: 12 }}>
-              <Autocomplete
-                options={accounts}
+              <AutocompleteField
+                label="Tài khoản"
+                emptyOption="— Chọn tài khoản —"
                 disabled={!!editing}
-                value={accounts.find((a) => a.id === form.accountId) || null}
-                onChange={(e, val) =>
-                  setForm((f) => ({ ...f, accountId: val ? val.id : "" }))
+                value={form.accountId}
+                onChange={(v) => setForm((f) => ({ ...f, accountId: v }))}
+                options={accounts}
+                optionValue="id"
+                optionLabel="userName"
+                optionCaption="id"
+                searchFields={["id", "userName", "description"]}
+                optionDescription={(a) =>
+                  [a?.description, a?.locked ? "Đã khóa" : null].filter(Boolean).join(" · ")
                 }
-                isOptionEqualToValue={(o, v) => o.id === v.id}
-                getOptionLabel={(a) => `${a.id} - ${a.userName}`}
-                filterOptions={(opts, { inputValue }) => {
-                  const q = inputValue.trim().toLowerCase();
-                  if (!q) return opts;
-                  return opts.filter(
-                    (a) =>
-                      String(a.id).includes(q) ||
-                      a.userName?.toLowerCase().includes(q) ||
-                      a.description?.toLowerCase().includes(q)
-                  );
-                }}
-                renderOption={(props, a) => {
-                  const { key, ...rest } = props;
-                  return (
-                    <Box component="li" key={a.id} {...rest} sx={{ display: "flex", alignItems: "center", gap: 1.5, py: 1 }}>
-                      <Avatar sx={{ width: 32, height: 32, bgcolor: "#E8F1FF", color: "primary.main" }}>
-                        <Person fontSize="small" />
-                      </Avatar>
-                      <Box sx={{ minWidth: 0 }}>
-                        <Typography variant="body2" fontWeight={700}>
-                          {a.id} - {a.userName}
-                        </Typography>
-                        {a.description ? (
-                          <Typography variant="caption" color="text.secondary">
-                            {a.description}
-                          </Typography>
-                        ) : null}
-                      </Box>
-                    </Box>
-                  );
-                }}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label="Tài khoản"
-                    placeholder="Tìm kiếm tài khoản..."
-                    required
-                    InputProps={{
-                      ...params.InputProps,
-                      startAdornment: (
-                        <>
-                          <InputAdornment position="start">
-                            <Person fontSize="small" />
-                          </InputAdornment>
-                          {params.InputProps.startAdornment}
-                        </>
-                      ),
-                    }}
-                  />
-                )}
+                dotColor={accountColor}
+                showDotInInput
+                required
+                error={!form.accountId}
+                noOptionsText="Không tìm thấy tài khoản"
+                popupMinWidth={360}
+                startIcon={<Person fontSize="small" />}
               />
             </Grid>
             <Grid size={{ xs: 12 }}>
-              <Autocomplete
+              <AutocompleteField
+                label="Địa điểm"
+                placeholder={form.locationCodes.length ? "" : "Tìm kiếm địa điểm..."}
                 multiple
                 disableCloseOnSelect
+                value={form.locationCodes}
+                onChange={(codes) => setForm((f) => ({ ...f, locationCodes: codes }))}
                 options={locations}
-                value={locations.filter((l) => form.locationCodes.includes(l.locationCode))}
-                onChange={(e, vals) =>
-                  setForm((f) => ({ ...f, locationCodes: vals.map((v) => v.locationCode) }))
+                optionValue="locationCode"
+                optionLabel="locationName"
+                searchFields={["locationCode", "locationName", "city"]}
+                optionDescription={(l) =>
+                  [l?.locationCode, l?.city, l?.region].filter(Boolean).join(" · ")
                 }
-                isOptionEqualToValue={(o, v) => o.locationCode === v.locationCode}
-                getOptionLabel={(l) => `${l.locationCode} - ${l.locationName}`}
-                filterOptions={(opts, { inputValue }) => {
-                  const q = inputValue.trim().toLowerCase();
-                  if (!q) return opts;
-                  return opts.filter(
-                    (l) =>
-                      l.locationCode?.toLowerCase().includes(q) ||
-                      l.locationName?.toLowerCase().includes(q) ||
-                      l.city?.toLowerCase().includes(q)
-                  );
-                }}
-                renderOption={(props, l, { selected }) => {
-                  const { key, ...rest } = props;
-                  return (
-                    <Box component="li" key={l.locationCode} {...rest} sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                      <Checkbox
-                        icon={<CheckBoxOutlineBlank fontSize="small" />}
-                        checkedIcon={<CheckBoxIcon fontSize="small" />}
-                        checked={selected}
-                        sx={{ mr: 0.5 }}
-                      />
-                      <Box sx={{ minWidth: 0 }}>
-                        <Typography variant="body2" fontWeight={600}>
-                          {l.locationName}
-                        </Typography>
-                        <Typography variant="caption" color="text.secondary">
-                          {l.locationCode}
-                          {l.city ? ` · ${l.city}` : ""}
-                        </Typography>
-                      </Box>
-                    </Box>
-                  );
-                }}
-                renderTags={(value, getTagProps) =>
-                  value.map((l, index) => {
-                    const { key, ...tagProps } = getTagProps({ index });
-                    return <Chip key={l.locationCode} label={l.locationName} size="small" {...tagProps} />;
-                  })
-                }
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label="Địa điểm"
-                    placeholder="Tìm kiếm địa điểm..."
-                    InputProps={{
-                      ...params.InputProps,
-                      startAdornment: (
-                        <>
-                          <InputAdornment position="start">
-                            <Place fontSize="small" />
-                          </InputAdornment>
-                          {params.InputProps.startAdornment}
-                        </>
-                      ),
-                    }}
-                  />
-                )}
+                dotColor={locationColor}
+                required
+                error={!form.locationCodes.length}
+                noOptionsText="Không tìm thấy địa điểm"
+                popupMinWidth={360}
+                startIcon={<Place fontSize="small" />}
               />
             </Grid>
             <Grid size={{ xs: 12, sm: 6 }}>

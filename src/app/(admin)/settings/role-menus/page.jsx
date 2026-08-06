@@ -255,16 +255,19 @@ export default function RoleMenusPage() {
           <AutocompleteField
             size="small"
             label="Nhóm quyền"
-            placeholder="Chọn nhóm quyền..."
+            emptyOption="— Chọn nhóm quyền —"
             value={roleId}
             onChange={onRoleChange}
             options={roles}
             optionValue="id"
             optionLabel="name"
-            optionCaption="description"
             searchFields={["name", "description"]}
+            optionDescription={(r) =>
+              [r?.description, r?.isActive === false ? "Đã ngưng" : null].filter(Boolean).join(" · ")
+            }
             dotColor={roleColor}
             showDotInInput
+            popupMinWidth={360}
             startIcon={<AdminPanelSettings fontSize="small" />}
             fullWidth={false}
             sx={{ maxWidth: 360, width: "100%" }}

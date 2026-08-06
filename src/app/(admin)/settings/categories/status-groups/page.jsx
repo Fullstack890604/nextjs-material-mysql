@@ -349,12 +349,12 @@ export default function StatusGroupsPage() {
           <Grid container spacing={2}>
             <Grid size={{ xs: 12, sm: 4 }}>
               <TextField label="Mã" value={form.code} onChange={setField("code")} fullWidth required disabled={!!editing}
-                error={!form.code.trim()} helperText={!form.code.trim() ? "Vui lòng nhập mã" : ""}
+                error={!form.code.trim()}
                 slotProps={{ input: { startAdornment: (<InputAdornment position="start"><Tag fontSize="small" /></InputAdornment>) } }} />
             </Grid>
             <Grid size={{ xs: 12, sm: 8 }}>
               <TextField label="Tên loại" value={form.name} onChange={setField("name")} fullWidth required
-                error={!form.name.trim()} helperText={!form.name.trim() ? "Vui lòng nhập tên loại" : ""}
+                error={!form.name.trim()}
                 slotProps={{ input: { startAdornment: (<InputAdornment position="start"><Category fontSize="small" /></InputAdornment>) } }} />
             </Grid>
             <Grid size={{ xs: 12 }}>

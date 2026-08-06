@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
-  Autocomplete,
   Backdrop,
   Box,
   Button,
@@ -42,6 +41,7 @@ import {
 import { useAuth } from "@/context/AuthContext";
 import { usePagePermissions } from "@/context/MenuContext";
 import { usePageSearch } from "@/context/SearchContext";
+import AutocompleteField from "@/components/AutocompleteField";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import DialogCloseButton from "@/components/DialogCloseButton";
 import PageHeader from "@/components/PageHeader";
@@ -71,24 +71,6 @@ const headCellSx = {
   whiteSpace: "nowrap",
   py: 1.5,
 };
-
-/** Chấm màu nhỏ đứng trước nhãn trong danh sách chọn. */
-function Dot({ color }) {
-  return (
-    <Box
-      component="span"
-      sx={{
-        display: "inline-block",
-        width: 8,
-        height: 8,
-        borderRadius: "50%",
-        bgcolor: color || "#757575",
-        mr: 1,
-        flexShrink: 0,
-      }}
-    />
-  );
-}
 
 export default function ProvincesPage() {
   const { user } = useAuth();
@@ -146,6 +128,15 @@ export default function ProvincesPage() {
     () => filtered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
     [filtered, page, rowsPerPage]
   );
+
+  // Số tỉnh/thành đang thuộc mỗi miền — hiện làm dòng mô tả trong ô chọn miền.
+  const provinceCountByRegion = useMemo(() => {
+    const map = {};
+    rows.forEach((r) => {
+      if (r.region) map[r.region] = (map[r.region] || 0) + 1;
+    });
+    return map;
+  }, [rows]);
 
   // Về trang đầu khi đổi từ khóa tìm kiếm
   useEffect(() => {
@@ -371,48 +362,28 @@ export default function ProvincesPage() {
           <Grid container spacing={2}>
             <Grid size={{ xs: 12, sm: 4 }}>
               <TextField label="Mã" value={form.code} onChange={setField("code")} fullWidth required disabled={!!editing}
-                error={!form.code.trim()} helperText={!form.code.trim() ? "Vui lòng nhập mã" : ""}
+                error={!form.code.trim()}
                 slotProps={{ input: { startAdornment: (<InputAdornment position="start"><Tag fontSize="small" /></InputAdornment>) } }} />
             </Grid>
             <Grid size={{ xs: 12, sm: 8 }}>
               <TextField label="Tên tỉnh / thành phố" value={form.name} onChange={setField("name")} fullWidth required
-                error={!form.name.trim()} helperText={!form.name.trim() ? "Vui lòng nhập tên tỉnh / thành phố" : ""}
+                error={!form.name.trim()}
                 slotProps={{ input: { startAdornment: (<InputAdornment position="start"><Place fontSize="small" /></InputAdornment>) } }} />
             </Grid>
             <Grid size={{ xs: 12, sm: 8 }}>
-              <Autocomplete
+              <AutocompleteField
+                label="Miền"
+                emptyOption="— Chọn miền —"
+                value={form.region}
+                onChange={(v) => setForm((f) => ({ ...f, region: v }))}
                 options={REGIONS}
-                value={form.region || null}
-                onChange={(e, val) => setForm((f) => ({ ...f, region: val || "" }))}
+                dotColor={(rg) => REGION_COLORS[rg]}
+                optionDescription={(rg) =>
+                  provinceCountByRegion[rg] ? `${provinceCountByRegion[rg]} tỉnh / thành` : ""
+                }
+                showDotInInput
                 noOptionsText="Không tìm thấy"
-                renderOption={(props, rg) => {
-                  const { key, ...rest } = props;
-                  return (
-                    <Box component="li" key={rg} {...rest} sx={{ display: "flex", alignItems: "center" }}>
-                      <Dot color={REGION_COLORS[rg]} />
-                      {rg}
-                    </Box>
-                  );
-                }}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label="Miền"
-                    slotProps={{
-                      input: {
-                        ...params.InputProps,
-                        startAdornment: (
-                          <>
-                            <InputAdornment position="start">
-                              {form.region ? <Dot color={REGION_COLORS[form.region]} /> : <Public fontSize="small" />}
-                            </InputAdornment>
-                            {params.InputProps.startAdornment}
-                          </>
-                        ),
-                      },
-                    }}
-                  />
-                )}
+                startIcon={<Public fontSize="small" />}
               />
             </Grid>
             <Grid size={{ xs: 12 }}>

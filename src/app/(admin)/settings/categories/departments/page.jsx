@@ -456,36 +456,44 @@ export default function DepartmentsPage() {
           <Grid container spacing={2}>
             <Grid size={{ xs: 12, sm: 4 }}>
               <TextField label="Mã" value={form.code} onChange={setField("code")} fullWidth required disabled={!!editing}
-                error={!form.code.trim()} helperText={!form.code.trim() ? "Vui lòng nhập mã phòng ban" : ""}
+                error={!form.code.trim()}
                 slotProps={{ input: { startAdornment: (<InputAdornment position="start"><Tag fontSize="small" /></InputAdornment>) } }} />
             </Grid>
             <Grid size={{ xs: 12, sm: 8 }}>
               <TextField label="Tên phòng ban" value={form.name} onChange={setField("name")} fullWidth required
-                error={!form.name.trim()} helperText={!form.name.trim() ? "Vui lòng nhập tên phòng ban" : ""}
+                error={!form.name.trim()}
                 slotProps={{ input: { startAdornment: (<InputAdornment position="start"><AccountTree fontSize="small" /></InputAdornment>) } }} />
             </Grid>
 
             <Grid size={{ xs: 12, sm: 6 }}>
               <AutocompleteField label="Trưởng phòng" value={form.managerCode}
                 onChange={(v) => setForm((f) => ({ ...f, managerCode: v }))}
-                options={staff} optionLabel="fullName" placeholder="Chưa phân công"
+                options={staff} optionLabel="fullName" emptyOption="— Chọn trưởng phòng —"
+                optionDescription={(s) =>
+                  [s?.code, s?.position, s?.departmentName].filter(Boolean).join(" · ")
+                }
                 startIcon={<BadgeIcon fontSize="small" />} />
             </Grid>
             <Grid size={{ xs: 12, sm: 6 }}>
               <AutocompleteField label="Địa điểm" value={form.locationCode}
                 onChange={(v) => setForm((f) => ({ ...f, locationCode: v }))}
                 options={locations} optionValue="locationCode" optionLabel="locationName"
-                placeholder="Không xác định" startIcon={<LocationOn fontSize="small" />} />
+                emptyOption="— Chọn địa điểm —"
+                optionDescription={(l) =>
+                  [l?.locationCode, l?.city, l?.region, l?.address].filter(Boolean).join(" · ")
+                }
+                popupMinWidth={360}
+                startIcon={<LocationOn fontSize="small" />} />
             </Grid>
 
             <Grid size={{ xs: 12, sm: 4 }}>
               <TextField label="Điện thoại" value={form.phone} onChange={handlePhoneChange} fullWidth
-                error={phoneError} helperText={phoneError ? "Số điện thoại không hợp lệ" : ""}
+                error={phoneError}
                 slotProps={{ input: { startAdornment: (<InputAdornment position="start"><PhoneIcon fontSize="small" /></InputAdornment>) } }} />
             </Grid>
             <Grid size={{ xs: 12, sm: 5 }}>
               <TextField label="Email" value={form.email} onChange={setField("email")} fullWidth
-                error={emailError} helperText={emailError ? "Email không hợp lệ" : ""}
+                error={emailError}
                 slotProps={{ input: { startAdornment: (<InputAdornment position="start"><EmailIcon fontSize="small" /></InputAdornment>) } }} />
             </Grid>
             <Grid size={{ xs: 12, sm: 3 }}>

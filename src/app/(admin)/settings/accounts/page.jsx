@@ -2,8 +2,6 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
-  Autocomplete,
-  Avatar,
   Backdrop,
   Box,
   Button,
@@ -49,6 +47,7 @@ import { useAuth } from "@/context/AuthContext";
 import { usePagePermissions } from "@/context/MenuContext";
 import { usePageSearch } from "@/context/SearchContext";
 import { useToast } from "@/context/ToastContext";
+import AutocompleteField, { Dot } from "@/components/AutocompleteField";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import DialogCloseButton from "@/components/DialogCloseButton";
 import PageHeader from "@/components/PageHeader";
@@ -76,6 +75,12 @@ const headCellSx = {
   py: 1.5,
 };
 
+/** Màu chấm theo trạng thái của dòng danh mục: đang hoạt động (xanh) / đã ẩn (xám). */
+const activeColor = (r) => (r?.isActive === false ? "#9e9e9e" : "#2e7d32");
+
+/** Màu theo trạng thái tài khoản — dùng cho chấm màu ở ô chọn "Trạng thái". */
+const STATUS_COLORS = { Active: "#2e7d32", Inactive: "#9e9e9e" };
+
 export default function AccountsPage() {
   const { user } = useAuth();
   const perms = usePagePermissions();
@@ -83,6 +88,7 @@ export default function AccountsPage() {
   const [rows, setRows] = useState([]);
   const [companies, setCompanies] = useState([]);
   const [staff, setStaff] = useState([]);
+  const [locations, setLocations] = useState([]);
   const [menuOptions, setMenuOptions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -136,6 +142,16 @@ export default function AccountsPage() {
     }
   }, []);
 
+  const loadLocations = useCallback(async () => {
+    try {
+      const res = await fetch("/api/locations");
+      const data = await res.json();
+      if (data.status === "OK") setLocations(data.data || []);
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
   const loadMenus = useCallback(async () => {
     try {
       const res = await fetch("/api/sys-menus");
@@ -153,12 +169,25 @@ export default function AccountsPage() {
   useEffect(() => {
     loadCompanies();
     loadStaff();
+    loadLocations();
     loadMenus();
     loadAccounts();
-  }, [loadCompanies, loadStaff, loadMenus, loadAccounts]);
+  }, [loadCompanies, loadStaff, loadLocations, loadMenus, loadAccounts]);
 
   const companyName = (code) =>
     companies.find((c) => c.code === code)?.name || code || "—";
+
+  // Mã cửa hàng lấy từ danh mục Địa điểm -> hiện tên cho dễ đọc, giữ mã khi không tra được.
+  const storeName = useCallback(
+    (code) => locations.find((l) => l.locationCode === code)?.locationName || code || "—",
+    [locations]
+  );
+
+  // Mã nhân viên -> họ tên trong danh mục Nhân sự ("" nếu không tra được).
+  const staffName = useCallback(
+    (code) => staff.find((s) => s.code === code)?.fullName || "",
+    [staff]
+  );
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -168,9 +197,11 @@ export default function AccountsPage() {
         r.userName?.toLowerCase().includes(q) ||
         r.description?.toLowerCase().includes(q) ||
         r.employeeCode?.toLowerCase().includes(q) ||
-        r.storeCode?.toLowerCase().includes(q)
+        staffName(r.employeeCode)?.toLowerCase().includes(q) ||
+        r.storeCode?.toLowerCase().includes(q) ||
+        storeName(r.storeCode)?.toLowerCase().includes(q)
     );
-  }, [rows, search]);
+  }, [rows, search, staffName, storeName]);
 
   const paged = useMemo(
     () => filtered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
@@ -326,7 +357,7 @@ export default function AccountsPage() {
                 <TableCell sx={headCellSx} align="center">STT</TableCell>
                 <TableCell sx={headCellSx}>Tên đăng nhập</TableCell>
                 <TableCell sx={headCellSx}>Mô tả</TableCell>
-                <TableCell sx={headCellSx}>Mã NV</TableCell>
+                <TableCell sx={headCellSx}>Nhân viên</TableCell>
                 <TableCell sx={headCellSx}>Cửa hàng</TableCell>
                 <TableCell sx={headCellSx}>Công ty</TableCell>
                 <TableCell sx={headCellSx}>Trang mặc định</TableCell>
@@ -361,8 +392,23 @@ export default function AccountsPage() {
                     <TableCell align="center">{page * rowsPerPage + index + 1}</TableCell>
                     <TableCell sx={{ fontWeight: 600 }}>{r.userName}</TableCell>
                     <TableCell sx={{ whiteSpace: "nowrap" }}>{r.description || "—"}</TableCell>
-                    <TableCell>{r.employeeCode || "—"}</TableCell>
-                    <TableCell>{r.storeCode || "—"}</TableCell>
+                    <TableCell sx={{ whiteSpace: "nowrap" }}>
+                      {r.employeeCode ? (
+                        <>
+                          <Typography variant="body2" fontWeight={600}>
+                            {staffName(r.employeeCode) || r.employeeCode}
+                          </Typography>
+                          {staffName(r.employeeCode) ? (
+                            <Typography variant="caption" color="text.secondary">
+                              {r.employeeCode}
+                            </Typography>
+                          ) : null}
+                        </>
+                      ) : (
+                        "—"
+                      )}
+                    </TableCell>
+                    <TableCell sx={{ whiteSpace: "nowrap" }}>{storeName(r.storeCode)}</TableCell>
                     <TableCell sx={{ whiteSpace: "nowrap" }}>{companyName(r.companyCode)}</TableCell>
                     <TableCell sx={{ whiteSpace: "nowrap" }}>{r.defaultPage || "—"}</TableCell>
                     <TableCell align="center">
@@ -457,64 +503,21 @@ export default function AccountsPage() {
         <DialogContent dividers>
           <Grid container spacing={2}>
             <Grid size={{ xs: 12 }}>
-              <Autocomplete
+              <AutocompleteField
+                label="Mã công ty"
+                emptyOption="— Chọn công ty —"
+                value={form.companyCode}
+                onChange={(v) => setForm((f) => ({ ...f, companyCode: v }))}
                 options={companies}
-                value={companies.find((c) => c.code === form.companyCode) || null}
-                onChange={(e, val) =>
-                  setForm((f) => ({ ...f, companyCode: val ? val.code : "" }))
+                optionCaption="code"
+                searchFields={["code", "name", "shortName"]}
+                optionDescription={(c) =>
+                  [c?.code, c?.shortName, c?.address].filter(Boolean).join(" · ")
                 }
-                isOptionEqualToValue={(o, v) => o.code === v.code}
-                getOptionLabel={(c) => c.name || ""}
-                filterOptions={(opts, { inputValue }) => {
-                  const q = inputValue.trim().toLowerCase();
-                  if (!q) return opts;
-                  return opts.filter(
-                    (c) =>
-                      c.code?.toLowerCase().includes(q) ||
-                      c.name?.toLowerCase().includes(q)
-                  );
-                }}
-                renderOption={(props, c) => {
-                  const { key, ...rest } = props;
-                  return (
-                    <Box
-                      component="li"
-                      key={c.code}
-                      {...rest}
-                      sx={{ display: "flex", alignItems: "center", gap: 1.5, py: 1 }}
-                    >
-                      <Avatar sx={{ width: 32, height: 32, bgcolor: "#E8F1FF", color: "primary.main" }}>
-                        <Business fontSize="small" />
-                      </Avatar>
-                      <Box sx={{ minWidth: 0 }}>
-                        <Typography variant="body2" fontWeight={700}>
-                          {c.name}
-                        </Typography>
-                        <Typography variant="caption" color="text.secondary">
-                          {c.code}
-                        </Typography>
-                      </Box>
-                    </Box>
-                  );
-                }}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label="Mã công ty"
-                    placeholder="Tìm kiếm công ty..."
-                    InputProps={{
-                      ...params.InputProps,
-                      startAdornment: (
-                        <>
-                          <InputAdornment position="start">
-                            <Business fontSize="small" />
-                          </InputAdornment>
-                          {params.InputProps.startAdornment}
-                        </>
-                      ),
-                    }}
-                  />
-                )}
+                dotColor={activeColor}
+                showDotInInput
+                noOptionsText="Không tìm thấy công ty"
+                startIcon={<Business fontSize="small" />}
               />
             </Grid>
             <Grid size={{ xs: 12, sm: 6 }}>
@@ -575,147 +578,61 @@ export default function AccountsPage() {
               />
             </Grid>
             <Grid size={{ xs: 12, sm: 6 }}>
-              <Autocomplete
+              <AutocompleteField
+                label="Mã nhân viên"
+                emptyOption="— Chọn nhân viên —"
+                value={form.employeeCode}
+                onChange={(v) => setForm((f) => ({ ...f, employeeCode: v }))}
                 options={staff}
-                value={staff.find((s) => s.code === form.employeeCode) || null}
-                onChange={(e, val) =>
-                  setForm((f) => ({ ...f, employeeCode: val ? val.code : "" }))
+                optionLabel="fullName"
+                optionCaption="code"
+                searchFields={["code", "fullName", "position"]}
+                optionDescription={(s) =>
+                  [s?.code, s?.position, s?.departmentName].filter(Boolean).join(" · ")
                 }
-                isOptionEqualToValue={(o, v) => o.code === v.code}
-                getOptionLabel={(s) => (s.code ? `${s.code} - ${s.fullName}` : "")}
-                filterOptions={(opts, { inputValue }) => {
-                  const q = inputValue.trim().toLowerCase();
-                  if (!q) return opts;
-                  return opts.filter(
-                    (s) =>
-                      s.code?.toLowerCase().includes(q) ||
-                      s.fullName?.toLowerCase().includes(q)
-                  );
-                }}
-                renderOption={(props, s) => {
-                  const { key, ...rest } = props;
-                  return (
-                    <Box
-                      component="li"
-                      key={s.code}
-                      {...rest}
-                      sx={{ display: "flex", alignItems: "center", gap: 1.5, py: 1 }}
-                    >
-                      <Avatar sx={{ width: 32, height: 32, bgcolor: "#E8F1FF", color: "primary.main" }}>
-                        <Badge fontSize="small" />
-                      </Avatar>
-                      <Box sx={{ minWidth: 0 }}>
-                        <Typography variant="body2" fontWeight={700}>
-                          {s.fullName}
-                        </Typography>
-                        <Typography variant="caption" color="text.secondary">
-                          {s.code}
-                        </Typography>
-                      </Box>
-                    </Box>
-                  );
-                }}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label="Mã nhân viên"
-                    placeholder="Tìm kiếm nhân viên..."
-                    InputProps={{
-                      ...params.InputProps,
-                      startAdornment: (
-                        <>
-                          <InputAdornment position="start">
-                            <Badge fontSize="small" />
-                          </InputAdornment>
-                          {params.InputProps.startAdornment}
-                        </>
-                      ),
-                    }}
-                  />
-                )}
+                dotColor={activeColor}
+                showDotInInput
+                noOptionsText="Không tìm thấy nhân viên"
+                popupMinWidth={360}
+                startIcon={<Badge fontSize="small" />}
               />
             </Grid>
             <Grid size={{ xs: 12, sm: 6 }}>
-              <TextField
+              <AutocompleteField
                 label="Mã cửa hàng"
+                emptyOption="— Chọn cửa hàng —"
                 value={form.storeCode}
-                onChange={setField("storeCode")}
-                fullWidth
-                slotProps={{
-                  input: {
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <Store fontSize="small" />
-                      </InputAdornment>
-                    ),
-                  },
-                }}
+                onChange={(v) => setForm((f) => ({ ...f, storeCode: v }))}
+                options={locations}
+                optionValue="locationCode"
+                optionLabel="locationName"
+                optionCaption="locationCode"
+                searchFields={["locationCode", "locationName", "city", "region"]}
+                optionDescription={(l) =>
+                  [l?.locationCode, l?.city, l?.region, l?.address].filter(Boolean).join(" · ")
+                }
+                dotColor={activeColor}
+                showDotInInput
+                noOptionsText="Không tìm thấy cửa hàng"
+                popupMinWidth={360}
+                startIcon={<Store fontSize="small" />}
               />
             </Grid>
             <Grid size={{ xs: 12, sm: 6 }}>
-              <Autocomplete
+              <AutocompleteField
+                label="Trang mặc định"
                 freeSolo
-                options={menuOptions}
+                emptyOption="— Chọn trang mặc định —"
                 value={form.defaultPage}
-                onChange={(e, val) =>
-                  setForm((f) => ({
-                    ...f,
-                    defaultPage: val
-                      ? typeof val === "string"
-                        ? val
-                        : val.path
-                      : "",
-                  }))
-                }
-                onInputChange={(e, val, reason) => {
-                  if (reason === "input") {
-                    setForm((f) => ({ ...f, defaultPage: val }));
-                  }
-                }}
-                isOptionEqualToValue={(o, v) => o.path === v?.path || o.path === v}
-                getOptionLabel={(m) => (typeof m === "string" ? m : m.path || "")}
-                filterOptions={(opts, { inputValue }) => {
-                  const q = inputValue.trim().toLowerCase();
-                  if (!q) return opts;
-                  return opts.filter(
-                    (m) =>
-                      m.path?.toLowerCase().includes(q) ||
-                      m.text?.toLowerCase().includes(q)
-                  );
-                }}
-                renderOption={(props, m) => {
-                  const { key, ...rest } = props;
-                  return (
-                    <Box component="li" key={m.id} {...rest}>
-                      <Box sx={{ minWidth: 0 }}>
-                        <Typography variant="body2" fontWeight={700}>
-                          {m.text}
-                        </Typography>
-                        <Typography variant="caption" color="text.secondary">
-                          {m.path}
-                        </Typography>
-                      </Box>
-                    </Box>
-                  );
-                }}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label="Trang mặc định"
-                    placeholder="Chọn hoặc nhập đường dẫn trang..."
-                    InputProps={{
-                      ...params.InputProps,
-                      startAdornment: (
-                        <>
-                          <InputAdornment position="start">
-                            <Web fontSize="small" />
-                          </InputAdornment>
-                          {params.InputProps.startAdornment}
-                        </>
-                      ),
-                    }}
-                  />
-                )}
+                onChange={(v) => setForm((f) => ({ ...f, defaultPage: v }))}
+                options={menuOptions}
+                optionValue="path"
+                optionLabel="path"
+                searchFields={["path", "text"]}
+                optionDescription="text"
+                noOptionsText="Không tìm thấy trang — có thể tự nhập đường dẫn"
+                popupMinWidth={360}
+                startIcon={<Web fontSize="small" />}
               />
             </Grid>
             <Grid size={{ xs: 12, sm: 6 }}>
@@ -733,10 +650,24 @@ export default function AccountsPage() {
                       </InputAdornment>
                     ),
                   },
+                  select: {
+                    renderValue: (v) => (
+                      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                        <Dot color={STATUS_COLORS[v]} />
+                        {v === "Active" ? "Hoạt động" : "Chưa kích hoạt"}
+                      </Box>
+                    ),
+                  },
                 }}
               >
-                <MenuItem value="Active">Hoạt động</MenuItem>
-                <MenuItem value="Inactive">Chưa kích hoạt</MenuItem>
+                <MenuItem value="Active" sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                  <Dot color={STATUS_COLORS.Active} />
+                  Hoạt động
+                </MenuItem>
+                <MenuItem value="Inactive" sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                  <Dot color={STATUS_COLORS.Inactive} />
+                  Chưa kích hoạt
+                </MenuItem>
               </TextField>
             </Grid>
             <Grid size={{ xs: 12, sm: 6 }}>

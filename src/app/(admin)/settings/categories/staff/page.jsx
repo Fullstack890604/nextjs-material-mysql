@@ -522,12 +522,15 @@ export default function StaffPage() {
             <Grid size={{ xs: 12 }}>
               <AutocompleteField
                 label="Chi nhánh / Công ty"
+                emptyOption="— Chọn chi nhánh / công ty —"
                 options={companies}
                 value={form.storeCode}
                 onChange={(v) => setForm((f) => ({ ...f, storeCode: v }))}
                 required
                 error={!form.storeCode}
-                helperText={!form.storeCode ? "Vui lòng chọn chi nhánh / công ty" : ""}
+                optionDescription={(c) =>
+                  [c?.code, c?.shortName, c?.address].filter(Boolean).join(" · ")
+                }
                 noOptionsText="Không tìm thấy chi nhánh / công ty"
                 dotColor={activeColor}
                 showDotInInput
@@ -543,7 +546,6 @@ export default function StaffPage() {
                 required
                 disabled={!!editing}
                 error={!form.code.trim()}
-                helperText={!form.code.trim() ? "Vui lòng nhập mã nhân sự" : ""}
                 slotProps={{
                   input: {
                     startAdornment: (
@@ -563,7 +565,6 @@ export default function StaffPage() {
                 fullWidth
                 required
                 error={!form.fullName.trim()}
-                helperText={!form.fullName.trim() ? "Vui lòng nhập họ tên" : ""}
                 slotProps={{
                   input: {
                     startAdornment: (
@@ -582,7 +583,12 @@ export default function StaffPage() {
                 value={form.departmentCode}
                 onChange={handleDepartmentChange}
                 noOptionsText="Không tìm thấy phòng ban"
-                placeholder="Chưa xếp phòng ban"
+                emptyOption="— Chọn phòng ban —"
+                optionDescription={(d) =>
+                  [d?.code, d?.locationName, d?.managerName ? `TP: ${d.managerName}` : null]
+                    .filter(Boolean)
+                    .join(" · ")
+                }
                 dotColor={activeColor}
                 showDotInInput
                 startIcon={<AccountTree fontSize="small" />}
@@ -596,7 +602,12 @@ export default function StaffPage() {
                 onChange={(v) => setForm((f) => ({ ...f, teamCode: v }))}
                 disabled={!form.departmentCode}
                 noOptionsText="Phòng ban này chưa có tổ, nhóm"
-                placeholder={form.departmentCode ? "Chưa xếp tổ, nhóm" : "Chọn phòng ban trước"}
+                emptyOption={form.departmentCode ? "— Chọn tổ, nhóm —" : "— Chọn phòng ban trước —"}
+                optionDescription={(t) =>
+                  [t?.code, t?.leaderName ? `Tổ trưởng: ${t.leaderName}` : null, t?.description]
+                    .filter(Boolean)
+                    .join(" · ")
+                }
                 dotColor={activeColor}
                 showDotInInput
                 startIcon={<Groups fontSize="small" />}
@@ -605,12 +616,13 @@ export default function StaffPage() {
             <Grid size={{ xs: 12, sm: 4 }}>
               <AutocompleteField
                 label="Chức vụ"
+                emptyOption="— Chọn chức vụ —"
                 options={positions}
                 value={form.position}
                 onChange={(v) => setForm((f) => ({ ...f, position: v }))}
                 required
                 error={!form.position}
-                helperText={!form.position ? "Vui lòng chọn chức vụ" : ""}
+                optionDescription={(p) => [p?.code, p?.description].filter(Boolean).join(" · ")}
                 noOptionsText="Không tìm thấy chức vụ"
                 dotColor={activeColor}
                 showDotInInput
@@ -620,12 +632,12 @@ export default function StaffPage() {
             <Grid size={{ xs: 12, sm: 4 }}>
               <AutocompleteField
                 label="Giới tính"
+                emptyOption="— Chọn giới tính —"
                 options={GENDERS}
                 value={form.gender}
                 onChange={(v) => setForm((f) => ({ ...f, gender: v }))}
                 required
                 error={!form.gender}
-                helperText={!form.gender ? "Vui lòng chọn giới tính" : ""}
                 noOptionsText="Không tìm thấy"
                 dotColor={(g) => GENDER_COLORS[g]}
                 showDotInInput
